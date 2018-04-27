@@ -2,541 +2,255 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Controllers\Import\UserImport;
-use App\Http\Resources\UserCollection;
-use App\Models\Permission;
-use App\Models\Role;
 use App\Models\User;
+use App\Models\UserCollection;
+use function GuzzleHttp\Promise\all;
 use Illuminate\Http\Request;
-use Illuminate\Http\Response;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Input;
-use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
-use Maatwebsite\Excel\Facades\Excel;
+use Mockery\Exception;
 
 class UserController extends Controller
 {
-   use Result;
-
     /**
-     * @api {get} /api/admin 显示管理员列表
-     * @apiGroup admin
-     *
-     *
-     * @apiSuccessExample 返回管理员信息列表
-     * HTTP/1.1 200 OK
-     * {
-     *  "data": [
-     *     {
-     *       "id": 2 // 整数型  用户标识
-     *       "name": "test"  //字符型 用户昵称
-     *       "email": "test@qq.com"  // 字符型 用户email，管理员登录时的email
-     *       "role": "admin" // 字符型 角色  可以取得值为admin或editor
-     *       "avatar": "" // 字符型 用户的头像图片
-     *     }
-     *   ],
-     * "status": "success",
-     * "status_code": 200,
-     * "links": {
-     * "first": "http://manger.test/api/admin?page=1",
-     * "last": "http://manger.test/api/admin?page=19",
-     * "prev": null,
-     * "next": "http://manger.test/api/admin?page=2"
-     * },
-     * "meta": {
-     * "current_page": 1, // 当前页
-     * "from": 1, //当前页开始的记录
-     * "last_page": 19, //总页数
-     * "path": "http://manger.test/api/admin",
-     * "per_page": 15,
-     * "to": 15, //当前页结束的记录
-     * "total": 271  // 总条数
-     * }
-     * }
-     *
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     * 用户注册接口
      */
-    public function index(Request $request)
+    public function userRegister(Request $request)
     {
-        //
-        $pageSize = (int)$request->input('pageSize');
-        $pageSize = isset($pageSize) && $pageSize?$pageSize:10;
-        $users = User::name()->email()->paginate($pageSize);
-        return new UserCollection($users);
-    }
+        $info = $request->all();
+        Validator::make($info, [
+            'name'    => 'nullable|max:100',
+            'tel'     => 'required|numeric',
+            'email'   => 'nullable',
+            'password'=> 'required',
+            'icon'    => 'nullable',
+            'open_id' => 'nullable',
+        ])->validate();
 
+        $is_exist = User::where('tel',$info['tel'])->first();
+        if ($is_exist){
+            return Common::jsonFormat('500','此手机号已经注册');
+        }
 
-    public function create(Request $request)
-    {
+        try{
+            $user = new User;
+            $user->id = Common::createBigIntId();
+            $user->name = (isset($info['name']) && !empty($info['name'])) ? $info['name'] : '宝宝美食'.rand(1,999);
+            $user->tel = $info['tel'];
+            $user->email = (isset($info['email']) && !empty($info['email'])) ? $info['email'] : 0;
+            $user->password = Common::md5_password($info['password']);
+            $user->icon = (isset($info['icon']) && !empty($info['icon'])) ? $info['icon'] : Common::defaultHeadImg();
+            $user->open_id = (isset($info['email']) && !empty($info['email'])) ? $info['open_id'] : 0;
+            $user->status = '1';
+            $user->session_key = Common::session_key();
+            $user->last_login_ip = Common::getClientIp();
+            $user->save();
 
+            return Common::jsonFormat('200','注册成功');
+        } catch (Exception $e){
+            Log::error($e);
+            return Common::jsonFormat('500','注册失败');
+        }
     }
 
     /**
-     * @api {post} /api/admin  建立新的管理员
-     * @apiGroup admin
-     * @apiParam {string} name 用户昵称
-     * @apiParam {string} email 用户登陆名　email格式 必须唯一
-     * @apiParam {string} password 用户登陆密码
-     * @apiParam {string="admin","editor"} [role="editor"] 角色 内容为空或者其他的都设置为editor
-     * @apiParam {string} [avatar] 用户头像地址
-     * @apiParamExample {json} 请求的参数例子:
-     *     {
-     *       name: 'test',
-     *       email: '1111@qq.com',
-     *       password: '123456',
-     *       role: 'editor',
-     *       avatar: 'uploads/20178989.png'
-     *     }
-     *
-     * @apiSuccessExample 新建用户成功
-     * HTTP/1.1 201 OK
-     * {
-     * "status": "success",
-     * "status_code": 201
-     * }
-     * @apiErrorExample 数据验证出错
-     * HTTP/1.1 404 Not Found
-     * {
-     * "status": "error",
-     * "status_code": 404,
-     * "message": "信息提交不完全或者不规范，校验不通过，请重新提交"
-     * }
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     * 用户登录
      */
-    public function store(Request $request)
+    public function userLogin(Request $request)
     {
-        //  新建管理员信息
-        $data = $request->only(['name', 'role', 'password','password_confirmation', 'email', 'avatar']);
-        $rules = [
-            'name'=>'required',
-            'role' =>'nullable',
-            'password' => 'required|confirmed',
-            'email' => 'required|unique:users',
-            'avatar' => 'nullable|string'
-        ];
-        $message = [
-            'name.required' => '用户名是必填项',
-            'password.required' => '用户密码是必填项',
-            'password.confirmed' => '两次输入的密码不匹配',
-            'email.required' => '登录名是必填项',
-            'email.unique' => '登录名已经存在，请重新填写',
-        ];
-        $validator = Validator::make($data, $rules, $message);
-        if ($validator->fails()) {
-            $errors = $validator->errors($validator);
-            return $this->errorWithCodeAndInfo(422, $errors);
+        $info = $request->all();
+        Validator::make($info, [
+            'tel' => 'required|numeric',
+            'password' => 'required',
+        ])->validate();
+
+        //判断手机号是否存在
+        $is_exist = User::where('tel',$info['tel'])->first()->toArray();
+
+        if (!$is_exist){
+            return Common::jsonFormat('500','账号不存在或密码错误');
         }
-        $data['password'] = bcrypt($data['password']);
-        $role = $request->input('role', ['user']);
-        if ($role === null || $role == [])
-        {
-            $role = ['user'];
-        }
-        if (! is_array($role)) {
-            $roles = json_decode($role, true);
-            $data['role'] = implode(',', $roles);
-        } else {
-            $data['role'] = implode(',', $role);
+        //验证密码正确性
+        $md5_password = Common::md5_password($info['password']);
+        if ($md5_password != $is_exist['password']){
+            return Common::jsonFormat('500','账号不存在或密码错误');
         }
 
-        if (User::create($data)) {
-            return $this->success();
+        try{
+            $user = User::where('tel',$info['tel'])->first();
+            $user->last_login_ip = Common::getClientIp(); //更新登陆ip
+            $user->session_key = Common::session_key(); //更新session_key
+            $res = $user->save();
+
+            $data = [];
+            if ($res){
+                $data = User::where('tel',$info['tel'])->first()->toArray();
+                $data['password'] = 'xxxx-xxxxx';
+                $data['last_login_ip'] = long2ip($data['last_login_ip']);
+            }
+
+            return Common::jsonFormat('200','登录成功',$data);
+        } catch (Exception $e){
+            Log::error($e);
+            return Common::jsonFormat('500','登录失败');
         }
     }
-
 
     /**
-     * @api {get} /api/admin/:id 显示指定的管理员
-     * @apiGroup admin
-     *
-     *
-     * @apiSuccessExample 返回管理员信息
-     * HTTP/1.1 200 OK
-     * {
-     * "data": {
-     *   "id": 1,
-     *   "name": "wmhello",
-     *   "email": "871228582@qq.com",
-     *   "role": "admin",
-     *   "avatar": ""
-     * },
-     * "status": "success",
-     * "status_code": 200
-     * }
-     *
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     * 用户列表
      */
-    public function show($id)
+    public function userList(Request $request)
     {
-        //
-       $user =  User::find($id);
-       return new \App\Http\Resources\User($user);
-    }
+        $info = $request->all();
+        Validator::make($info, [
+            'name' => 'nullable',
+            'tel'  => 'nullable|numeric',
+            'page' => 'nullable|integer',
+            'length' => 'nullable|integer',
+        ])->validate();
 
-    public function edit($id)
-    {
-        //
-    }
+        $user_query = User::query();
 
+        if (isset($info['name']) && $info['name']){
+            $user_query->where('name','like','%'.$info['name'].'%');
+        }
+        if (isset($info['tel']) && $info['tel']){
+            $user_query->where('tel',$info['tel']);
+        }
+        $limit = (isset($info['length']) && $info['length']) ? $info['length'] : 10;
+        $offset = (isset($info['page']) && ($info['page']-1)*$limit) ? $info['page'] : 0;
+
+        $total = $user_query->count();
+        $user = $user_query->offset($offset)->limit($limit)->orderBy('created_at','desc')->get();
+
+        foreach ($user as $v){
+            $v['last_login_ip'] = long2ip($v['last_login_ip']);
+            $v['password'] = 'xxxx-xxxx';
+        }
+        $data = ['total' => $total,'data' => $user];
+        return Common::jsonFormat('200','获取成功',$data);
+    }
 
     /**
-     * @api {put} /api/admin/:id  更新指定的管理员
-     * @apiGroup admin
-     * @apiHeaderExample {json} http头部请求:
-     *     {
-     *       "content-type": "application/x-www-form-urlencoded"
-     *     }
-     * @apiParam {string} name 用户昵称
-     * @apiParam {string="admin","editor"} [role=editor] 角色 内容为空或者其他的都设置为editor
-     * @apiParam {string} [avatar] 用户头像地址
-     * @apiParamExample {json} 请求参数例子
-     *{
-     *      name: 'test',
-     *      role: 'editor',
-     *      avatar: 'uploads/20174356.png'
-     * }
-     * @apiSuccessExample 返回密码设置成功的结果
-     * HTTP/1.1 200 OK
-     * {
-     * "status": "success",
-     * "status_code": 200
-     * }
-     * @apiErrorExample 数据验证出错
-     * HTTP/1.1 404 Not Found
-     * {
-     * "status": "error",
-     * "status_code": 404,
-     * "message": "信息提交不完全或者不规范，校验不通过，请重新提交"
-     * }
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     * 用户信息修改
      */
-
-    public function update(Request $request, $id)
+    public function userModify(Request $request)
     {
-        $data = $request->only(['name', 'role', 'avatar']);
-        $rules = [
-            'name' => 'required|string',
-            'role' => 'nullable|array',
-            'avatar' =>'nullable|string'
-        ];
-        $message = [
-            'name.required' => '用户名是必填项',
-        ];
-        $validator = Validator::make($data, $rules, $message);
-        if ($validator->fails()) {
-            $errors = $validator->errors($validator);
-            return $this->errorWithCodeAndInfo(422, $errors);
+        $info = $request->all();
+        Validator::make($info, [
+            'id' => 'required|numeric',
+            'name' => 'nullable',
+            'tel' => 'nullable|numeric',
+            'password' => 'nullable',
+            'password_confirmation' => 'required_with:password|confirmed',
+            'email' => 'nullable',
+            'icon' => 'nullable',
+        ])->validate();
+
+        //判断用户是否存在
+        $user = User::find($info['id']);
+        if (!$user){
+            return Common::jsonFormat('500','此用户不存在');
+        }
+        $where = [];
+        if (isset($info['name']) && $info['name']){
+            $where['name'] = $info['name'];
+        }
+        if (isset($info['tel']) && $info['tel']){
+            $where['tel'] = $info['tel'];
+        }
+        if (isset($info['password']) && $info['password']){
+            $where['password'] = $info['password'];
+        }
+        if (isset($info['email']) && $info['email']){
+            $where['email'] = $info['email'];
+        }
+        if (isset($info['icon']) && $info['icon']){
+            $where['icon'] = $info['icon'];
         }
 
-        $role = $request->input('role', ['user']);
-        if ($role === null || $role == [])
-        {
-            $role = ['user'];
+        if (!empty($where)){
+            $res = User::where('id',$info['id'])->update($where);
+            if ($res){
+                return Common::jsonFormat('200','修改成功');
+            }else{
+                return Common::jsonFormat('500','修改失败');
+            }
         }
-        if (! is_array($role)) {
-            $roles = json_decode($role, true);
-            $data['role'] = implode(',', $roles);
-        } else {
-            $data['role'] = implode(',', $role);
-        }
-        $bool = User::where('id', $id)->update($data);
-        if ($bool) {
-            return $this->success();
-        }
+        return Common::jsonFormat('200','修改成功');
+    }
+
+    /**
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     * 用户商品收藏列表
+     */
+    public function userCollectionList(Request $request)
+    {
+        $info = $request->all();
+        Validator::make($info, [
+            'user_id' => 'nullable|numeric',
+            'goods_id' => 'nullable|numeric',
+        ])->validate();
+
+        $data = UserCollection::all();
+
+        return Common::jsonFormat('200','获取成功',$data);
 
     }
 
     /**
-     * @api {delete} /api/admin/:id  删除指定的管理员
-     * @apiGroup admin
-     *
-     * @apiSuccessExample 用户删除成功
-     * HTTP/1.1 200 OK
-     * {
-     * "status": "success",
-     * "status_code": 200
-     * }
-     *
-     * @apiErrorExample 用户删除失败
-     * HTTP/1.1 404 ERROR
-     * {
-     * "status": "error",
-     * "status_code": 404
-     * }
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     * 用户商品收藏添加、修改
      */
-
-    public function destroy($id)
+    public function userCollectionModify(Request $request)
     {
-        //
-        return response()->json([
-          'status' => 'success',
-          'status_code' => 200,
-          'message' => '演示功能，暂时不提供用户删除功能'
-        ], 200);
-        $user = User::find($id);
-        if ($user->delete()) {
-            return $this->success();
-        } else {
-            return $this->error();
-        }
+        $info = $request->all();
 
-    }
+        if (isset($info['collection_id']) && $info['collection_id']){ //修改用户商品收藏
+            Validator::make($info, [
+                'collection_id' => 'required|integer',
+                'status'        => 'required|integer',
+            ])->validate();
+            try{
+                $collection = UserCollection::find($info['collection_id']);
+                $collection->status = $info['status'];
+                $collection->save();
 
-    /**
-     * @api {post} /api/admin/:id/reset  重置指定管理员的密码
-     * @apiGroup admin
-     *
-     * @apiParam {string} password 用户密码
-     *
-     * @apiSuccessExample 返回密码设置成功的结果
-     * HTTP/1.1 200 OK
-     * {
-     * "status": "success",
-     * "status_code": 200
-     * }
-     *
-     */
-    public function reset(Request $request, $id)
-    {
-        return response()->json([
-            'status' => 'success',
-            'status_code' => 200,
-            'message' => '系统演示，暂时不提供用户修改密码功能'
-        ], 200);
-        $password = $request->input('password');
-        $user = User::find($id);
-        $user->password = bcrypt($password);
-        $user->save();
-        return $this->success();
-    }
+                return Common::jsonFormat('200','修改成功');
+            } catch (Exception $e){
+                Log::error($e);
+                return Common::jsonFormat('500','修改失败');
+            }
+        }else{ //新增用户收藏
+            Validator::make($info, [
+                'user_id'       => 'required|numeric',
+                'goods_id'      => 'required|numeric',
+            ])->validate();
+            try{
+                $collection = new UserCollection;
+                $collection->user_id = $info['user_id'];
+                $collection->goods_id = $info['goods_id'];
+                $collection->status = '1';
+                $collection->save();
 
-    /**
-     * @api {post} /api/admin/upload  头像图片上传
-     * @apiGroup admin
-     * @apiHeaderExample {json} http头部请求:
-     *     {
-     *       "content-type": "application/form-data"
-     *     }
-     *
-     * @apiSuccessExample 上传成功
-     * HTTP/1.1 200 OK
-     * {
-     * "status": "success",
-     * "status_code": 200，
-     * "data": {
-     *   "url" : 'uploads/3201278123689.png'
-     *  }
-     * }
-     *
-     * @apiErrorExample 上传失败
-     * HTTP/1.1 400 ERROR
-     * {
-     * "status": "error",
-     * "status_code": 400
-     * }
-     */
-
-    public function uploadAvatar(Request $request)
-    {
-        if ($request->isMethod('POST')) {
-//            var_dump($_FILES);
-            $file = $request->file('photo');
-            //判断文件是否上传成功
-            if ($file->isValid()) {
-                //获取原文件名
-                $originalName = $file->getClientOriginalName();
-                //扩展名
-                $ext = $file->getClientOriginalExtension();
-                //文件类型
-                $type = $file->getClientMimeType();
-                //临时绝对路径
-                $realPath = $file->getRealPath();
-
-                $filename = date('YmdHiS') . uniqid() . '.' . $ext;
-
-                $bool = Storage::disk('uploads')->put($filename, file_get_contents($realPath));
-                if ($bool) {
-                    $filename = 'uploads/' . $filename;
-                    return response()->json([
-                        'status' => 'success',
-                        'status_code' => 200,
-                        'data' => [
-                            'url' => $filename,
-                        ]
-                    ], 200);
-                } else {
-                    return $this->error();
-                }
+                return Common::jsonFormat('200','收藏成功');
+            } catch (Exception $e){
+                Log::error($e);
+                return Common::jsonFormat('500','收藏失败');
             }
         }
     }
 
-    /**
-     * 修改个人密码
-     * 获取三个字段，oldPassword => 原来密码  password=>新密码 password_confirmation
-     * 原密码相同才能修改密码为新密码
-     */
-    public function modify(Request $request)
-    {
-
-        return response()->json([
-            'status' => 'success',
-            'status_code' => 200,
-            'message' => '系统演示，暂时不提供用户修改密码功能'
-        ], 200);
-
-        $oldPassword = $request->input('oldPassword');
-        $password = $request->input('password');
-        $data = $request->all();
-        $rules = [
-            'oldPassword'=>'required|between:6,20',
-            'password'=>'required|between:6,20|confirmed',
-        ];
-        $messages = [
-            'required' => '密码不能为空',
-            'between' => '密码必须是6~20位之间',
-            'confirmed' => '新密码和确认密码不匹配'
-        ];
-        $validator = Validator::make($data, $rules, $messages);
-        $user = Auth::user();
-        $validator->after(function($validator) use ($oldPassword, $user) {
-            if (!\Hash::check($oldPassword, $user->password)) {
-                $validator->errors()->add('oldPassword', '原密码错误');
-            }
-        });
-        if ($validator->fails()) {
-            $errors = $validator->errors($validator); //返回一次性错误
-            return $this->errorWithCodeAndInfo(422,$errors);
-        }
-        $user->password = bcrypt($password);
-        if ($user->save()) {
-            return $this->success();
-        } else {
-            return $this->error();
-        }
-        
-    }
-
-    /**
-     * @api {get} /api/user 获取当前登陆的用户信息
-     * @apiGroup login
-     *
-     *
-     * @apiSuccessExample 信息获取成功
-     * HTTP/1.1 200 OK
-     *{
-     * "data": {
-     *    "id": 1,
-     *    "name": "xxx",
-     *    "email": "xxx@qq.com",
-     *    "roles": "xxx", //角色: admin或者editor
-     *    "avatar": ""
-     *  },
-     *  "status": "success",
-     *  "status_code": 200
-     *}
-     */
-    public function getUserInfo(Request $request)
-    {
-        // 获取用户信息和用户组对应的用户权限
-        // 用户权限
-        $user = $request->user();
-        $roles = explode(',',$user['role']);
-        $data = [
-            'id' => $user['id'],
-            'name' => $user['name'],
-            'email' => $user['email'],
-            'role' => $roles,
-            'avatar' => $user['avatar']
-        ];
-        // 用户权限
-        $feature = \App\Models\Role::whereIn('name',$roles)->pluck('permission');
-        $feature = $feature->toArray();
-        $strPermission = implode(',', $feature);
-        $permissions = explode(',', $strPermission);
-        $feature = Permission::select(['route_name', 'method', 'route_match', 'id'])->whereIn('id',$permissions)->get();
-        $feature = $feature->toArray();
-        $data['permission'] = $feature;
-        return response()->json([
-            'data' => $data,
-            'status' => 'success',
-            'status_code' => 200,
-        ],200);
-    }
-
-    public function upload(UserImport $import)
-    {
-        $bool = $import->handleImport($import);
-        if ($bool) {
-            return $this->success();
-        } else {
-            return $this->error();
-        }
-    }
 
 
-    protected  function queryData($pageSize = null, $page = 1, $name, $email){
-        // 查询条件  根据姓名或者电话号码进行查询
-        $offset = $pageSize * ($page - 1) == 0? 0: $pageSize * ($page - 1);
-        $model = $this->getModel();
-        $lists = $model::select('name', 'email', 'role')
-                       ->name()
-                       ->email()
-                       ->when($pageSize,function($query) use($offset, $pageSize) {
-                              return $query->offset($offset)->limit($pageSize);
-                       })
-                       ->get();
-
-        return $lists;
-    }
-
-    /**
-     * 根据传入的数据生成内容
-     * @param $data
-     * @return array
-     */
-    protected function generatorData($data): array
-    {
-        $items = [];
-        // $data = $data['data'];  // 数据库中的数据
-        $arrRoles = Role::pluck('explain', 'name')->all();
-        foreach ($data as $item) {
-            $arr = [];
-            $arr['name'] = $item['name'];
-            $arr['email'] = $item['email'];
-            $tmpRoles = explode(',', $item['role']);
-            $strRoles = '';
-            foreach ($tmpRoles as $tmp) {
-              $strRoles .= $arrRoles[$tmp].',';
-            }
-            $arr['role'] = substr($strRoles,0, -1);
-            array_push($items, $arr);
-        }
-        array_unshift($items, ['姓名', '登录名', '角色']);
-        return $items;
-    }
-
-    public function test()
-    {
-        $str = 'abacde,';
-        dump(substr($str,0,-1));
-    }
-
-    public function deleteAll()
-    {
-        return response()->json([
-            'status' => 'success',
-            'status_code' => 200,
-            'message' => '演示功能，暂时不提供批量删除功能'
-        ], 200);
-    }
-
-    protected function  getExportFile()
-    {
-        // 导出文件的名称
-        return '用户管理';
-    }
-
-    protected function getModel()
-    {
-        // 当前控制器所对应的模型
-        return 'App\Models\User';
-    }
 }

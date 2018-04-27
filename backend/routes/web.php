@@ -14,3 +14,8 @@
 Route::get('/', function () {
     return view('welcome');
 });
+
+//接口文档路由
+Route::get('/api_doc', function () {
+    return view('api_doc');
+});

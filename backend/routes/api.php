@@ -54,4 +54,44 @@ Route::middleware('auth:api')->group(function() {
     Route::post('/sms/send', 'SmsController@send')->name('sms.send');
     Route::post('/sms/verify', 'SmsController@verify')->name('sms.verify');
 
+
+
+});
+
+//-----------------------------------------------------------------//
+//前端接口
+Route::group(['prefix' => 'home'], function(){
+    Route::get('goodscategorylist', 'HomeController@Goodscategorylist')->name('home.goodsCategoryList');
+    Route::get('goodslist', 'HomeController@goodslist')->name('home.goodsList');
+    Route::get('orderlist', 'HomeController@orderlist')->name('home.orderList');
+    Route::get('collectionlist', 'HomeController@collectionlist')->name('home.collectionList');
+    Route::post('sellerregister', 'HomeController@sellerregister')->name('home.sellerRegister');
+    Route::post('sellerlogin', 'HomeController@sellerlogin')->name('home.sellerLogin');
+    Route::post('orderList', 'OrderController@orderList')->name('order.orderList');
+    Route::post('orderAdd', 'OrderController@orderAdd')->name('order.orderAdd');
+    Route::post('orderModify', 'OrderController@orderModify')->name('order.orderModify');
+    Route::post('userRegister', 'UserController@userRegister')->name('user.userRegister');
+    Route::post('userLogin', 'UserController@userLogin')->name('user.userLogin');
+    Route::post('userModify', 'UserController@userModify')->name('user.userModify');
+    Route::post('userCollectionList', 'UserController@userCollectionList')->name('user.userCollectionList');
+    Route::post('userCollectionModify', 'UserController@userCollectionModify')->name('user.userCollectionModify');
+    Route::any('serve', 'OrderController@serve')->name('order.serve');
+
+    //商家
+    Route::post('sellerList', 'SellerController@sellerList')->name('user.sellerList');
+    Route::post('sellerRegister', 'SellerController@sellerRegister')->name('user.sellerRegister');
+    Route::post('sellerLogin', 'SellerController@sellerLogin')->name('user.sellerLogin');
+    Route::post('sellerModify', 'SellerController@sellerModify')->name('user.sellerModify');
+});
+
+//后台接口
+Route::group(['prefix' => 'manage'], function(){
+    Route::post('goodsCategoryList', 'GoodsController@goodsCategoryList')->name('goods.goodsCategoryList');
+    Route::post('goodsCategoryModify', 'GoodsController@goodsCategoryModify')->name('goods.goodsCategoryModify');
+    Route::post('goodsCategoryDelete', 'GoodsController@goodsCategoryDelete')->name('goods.goodsCategoryDelete');
+    Route::post('goodsModify', 'GoodsController@goodsModify')->name('goods.goodsModify');
+    Route::post('goodsList', 'GoodsController@goodsList')->name('goods.goodsList');
+    Route::post('goodsDetail', 'GoodsController@goodsDetail')->name('goods.goodsDetail');
+    Route::post('goodsDelete', 'GoodsController@goodsDelete')->name('goods.goodsDelete');
+    Route::post('userList', 'UserController@userList')->name('user.userList');
 });
