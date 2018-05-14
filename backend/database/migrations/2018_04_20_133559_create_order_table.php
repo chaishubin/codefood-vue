@@ -25,6 +25,7 @@ class CreateOrderTable extends Migration
             $table->integer('pay_time')->comment('付款时间');
             $table->tinyInteger('order_status')->comment('订单状态');
             $table->timestamps();
+            $table->primary('id');
         });
     }
 

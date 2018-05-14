@@ -5,5 +5,5 @@ const prodEnv = require('./prod.env')
 module.exports = merge(prodEnv, {
   NODE_ENV: '"development"',
   BASE_API: '"http://127.0.0.1:8010/api"',
-  IMG_API: '"http://127.0.0.1:8010/"',
+  IMG_API: '"http://127.0.0.1:8013/"',
 })

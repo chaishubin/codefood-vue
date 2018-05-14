@@ -93,5 +93,12 @@ Route::group(['prefix' => 'manage'], function(){
     Route::post('goodsList', 'GoodsController@goodsList')->name('goods.goodsList');
     Route::post('goodsDetail', 'GoodsController@goodsDetail')->name('goods.goodsDetail');
     Route::post('goodsDelete', 'GoodsController@goodsDelete')->name('goods.goodsDelete');
+    Route::post('goodsTag', 'Common@goodsTag')->name('common.goodsTag');
     Route::post('userList', 'UserController@userList')->name('user.userList');
+    Route::post('uploadImg', 'Common@uploadImg')->name('common.uploadImg');
+});
+
+//微信相关
+Route::group(['prefix' => 'wechat'], function (){
+    Route::any('wxPay', 'PayController@wxPay')->name('pay.wxPay');
 });

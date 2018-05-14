@@ -111,6 +111,8 @@ class UserController extends Controller
         Validator::make($info, [
             'name' => 'nullable',
             'tel'  => 'nullable|numeric',
+            'open_id' => 'nullable|max:100',
+            'status' => 'nullable|boolean',
             'page' => 'nullable|integer',
             'length' => 'nullable|integer',
         ])->validate();
@@ -122,6 +124,12 @@ class UserController extends Controller
         }
         if (isset($info['tel']) && $info['tel']){
             $user_query->where('tel',$info['tel']);
+        }
+        if (isset($info['open_id']) && $info['open_id']){
+            $user_query->where('open_id',$info['open_id']);
+        }
+        if (isset($info['status']) && !is_null($info['status'])){
+            $user_query->where('status',$info['status']);
         }
         $limit = (isset($info['length']) && $info['length']) ? $info['length'] : 10;
         $offset = (isset($info['page']) && ($info['page']-1)*$limit) ? $info['page'] : 0;

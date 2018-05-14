@@ -16,6 +16,7 @@ class CreateGoodsTable extends Migration
         Schema::create('goods', function (Blueprint $table) {
             $table->bigInteger('goods_id');
             $table->bigInteger('category_id')->comment('分类id');
+            $table->bigInteger('seller_id')->comment('商家id');
             $table->string('goods_name',100)->comment('产品名称');
             $table->string('goods_summary',100)->comment('产品简要');
             $table->decimal('sell_price',20,2)->comment('售价');

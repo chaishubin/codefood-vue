@@ -83,7 +83,6 @@ class Common
      */
     public static function orderStatus($order_status_id=0)
     {
-
         $order_status = [
             '101' => '待支付',
             '102' => '已支付',
@@ -109,8 +108,9 @@ class Common
     public static function payWay($pay_way_id=0)
     {
         $pay_way = [
-            '101' => '支付全额',
-            '102' => '支付定金',
+            '101' => '微信支付',
+            '102' => '支付宝',
+            '103' => '银行卡',
         ];
         if ($pay_way_id){
             if (!array_key_exists($pay_way_id,$pay_way)){
@@ -150,6 +150,32 @@ class Common
         return Common::jsonFormat('200','获取成功',$data);
     }
 
+
+    /**
+     * @param int $platform_id
+     * @return \Illuminate\Http\JsonResponse|int|mixed
+     * 商品标签配置文件
+     */
+    public static function goodsTag($goods_tag_id=0)
+    {
+        $goods_tag = [
+            '101' => '新品',
+            '102' => '特价',
+            '103' => '满减',
+        ];
+        if ($goods_tag_id){
+            if (!array_key_exists($goods_tag_id,$goods_tag)){
+                return $goods_tag_id;
+            }
+            return $goods_tag[$goods_tag_id];
+        }
+        $data = [];
+        foreach ($goods_tag as $k => $v){
+            $data[] = ['id' => $k,'name' => $v];
+        }
+        return Common::jsonFormat('200','获取成功',$data);
+    }
+
     /**
      * @param int $banner_position_id
      * @return \Illuminate\Http\JsonResponse|int|mixed
@@ -183,29 +209,58 @@ class Common
     {
         if ($request->isMethod('POST')){
             $file = $request->file('file');
+            if (count($file) > 1){ //多图上传
+                $url = [];
+                foreach ($file as $k => $v){
+                    if ($v->isValid()){
+                        $realPath = $v->getRealPath();
+                        $tmpName = $v->getFileName();
+                        $extName = $v->getClientOriginalExtension();
 
-            if ($file->isValid()){
-                //原文件名
-                $originalName = $file->getClientOriginalName();
-                //扩展名
-                $extName = $file->getClientOriginalExtension();
-                //文件类型
-                $type = $file->getMimeType();
-                //临时绝对路径
-                $realPath = $file->getRealPath();
+//                        $fdsk = new Fdfs();
+//                        $url[] = $fdsk->upload($realPath,$extName);
 
-                $filename = date('Y-m-d-H-i-s').'-'.uniqid().'.'.$extName;
+                        $filename = date('Y-m-d-H-i-s').'-'.uniqid().'.'.$extName;
+                        $url[] = $v->storeAs('uploads',$filename);
 
-                $path = $file->storeAs('uploads',$filename);
-
-                if ($path){
-                    return Common::jsonFormat('200','上传成功',$path);
-                }else{
+                    }else{
+                        return Common::jsonFormat('500','图片上传出错,请重试！');
+                    }
+                }
+                if($url && count($url) == count($file)) {
+//                    $img_url = [];
+//                    foreach ($url as $v){
+//                        $img_url[] = $v['url'];
+//                    }
+//                    return Common::jsonFormat('200','上传成功',$img_url);
+                    return Common::jsonFormat('200','上传成功',$url); //调试使用，若使用laravel本身的storeAs方法，其上传成功之后直接返回url，不同于fdfs返回一个包含url的数组
+                } else {
                     return Common::jsonFormat('500','上传失败');
                 }
-            }else{
-                return false;
+
+            }else{ //单图上传
+                if ($file->isValid()){
+                    $realPath = $file->getRealPath();
+                    $tmpName = $file->getFileName();
+                    $extName = $file->getClientOriginalExtension();
+
+//                    $fdsk = new Fdfs();
+//                    $url = $fdsk->upload($realPath,$extName);
+
+                    $filename = date('Y-m-d-H-i-s').'-'.uniqid().'.'.$extName;
+                    $url = $file->storeAs('uploads',$filename);
+
+                    if($url) {
+//                        return Common::jsonFormat('200','上传成功',$url['url']);
+                        return Common::jsonFormat('200','上传成功',$url); //调试使用，若使用laravel本身的storeAs方法，其上传成功之后直接返回url，不同于fdfs返回一个包含url的数组
+                    } else {
+                        return Common::jsonFormat('500','上传失败');
+                    }
+                }else{
+                    return Common::jsonFormat('500','图片上传出错,请重试！');
+                }
             }
+
         }else{
             return Common::jsonFormat('500','Method方法只能为POST');
         }
@@ -299,5 +354,20 @@ class Common
         $data = strtoupper($data);
         //最后再进行一次MD5运算并返回
         return strtoupper(md5($data));
+    }
+
+    /**
+     * @param int $length
+     * @return string
+     * 随机字符串生成（目前只在微信支付统一下单时使用）
+     */
+    public static function getNonceStr($length = 32)
+    {
+        $chars = "abcdefghijklmnopqrstuvwxyz0123456789";
+        $str = "";
+        for ($i = 0; $i < $length; $i++) {
+            $str .= substr($chars, mt_rand(0, strlen($chars) - 1), 1);
+        }
+        return $str;
     }
 }

@@ -33,7 +33,27 @@ export default new Router({
                     path: '/productCategories',
                     component: resolve => require(['../views/productCategories/index.vue'], resolve)
                 },
-            ]
+                {
+                    path: '/sellers',
+                    component: resolve => require(['../views/sellers/index.vue'], resolve)
+                },
+                {
+                    path: '/users',
+                    component: resolve => require(['../views/users/index.vue'], resolve)
+                },
+                {
+                    path: '/goods',
+                    component: resolve => require(['../views/goods/index.vue'], resolve)
+                },
+                {
+                    path: '/goodsCategory',
+                        component: resolve => require(['../views/goodsCategory/index.vue'], resolve)
+                },
+                {
+                    path: '/orders',
+                        component: resolve => require(['../views/orders/index.vue'], resolve)
+                },
+            ],
         },
         {
             path: '/login',

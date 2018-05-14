@@ -34,49 +34,98 @@ export default {
   data:function(){
     return {
       routedata:[
-                    {
-                        icon: 'el-icon-menu',
-                        index: '1',
-                        title: '运营中心',
-                        subs: [
-                            {
-                                index: '1-1',
-                                title: '产品管理',
-                                subs:[
-                                  {
-                                    index: 'HealthcareInternational',
-                                    title: '国际医疗'
-                                  },      
-                                  {
-                                    index: 'HICustomer',
-                                    title: '国际医疗客户信息'
-                                  },
-                                ]
-                            },
-                        ]
-                    },
-                    {
-                        icon: 'el-icon-setting',
-                        index: '2',
-                        title: '设置中心',
-                        subs: [
-                            {
-                                index: 'adSet',
-                                title: '广告设置',
-                            },
-                            {
-                                index: '2-1',
-                                title: '基础设置',
-                                subs: [
-                                  {
-                                    index: 'productCategories',
-                                    title: '产品分类'
-                                  },
-                                ]
-                            },
-                        ]
-                    },
-                ]
+        {
+            icon: 'el-icon-menu',
+            index: '1',
+            title: '运营中心',
+            subs: [
+                {
+                    index: '1-1',
+                    title: '产品管理',
+                    subs:[
+                      {
+                        index: 'HealthcareInternational',
+                        title: '国际医疗'
+                      },
+                      {
+                        index: 'HICustomer',
+                        title: '国际医疗客户信息'
+                      },
+                    ]
+                },
+            ]
+        },
+        {
+            icon: 'el-icon-setting',
+            index: '2',
+            title: '设置中心',
+            subs: [
+                {
+                    index: 'adSet',
+                    title: '广告设置',
+                },
+                {
+                    index: '2-1',
+                    title: '基础设置',
+                    subs: [
+                      {
+                        index: 'productCategories',
+                        title: '产品分类'
+                      },
+                    ]
+                },
+            ]
+        },
+        {
+          icon: 'el-icon-setting',
+          index: '3',
+          title: '商家中心',
+          subs: [
+              {
+                  index: 'sellers',
+                  title: '商家列表',
+              },
+          ]
+        },
+        {
+          icon: 'el-icon-setting',
+          index: '4',
+          title: '用户中心',
+          subs: [
+              {
+                  index: 'users',
+                  title: '用户列表',
+              },
+          ]
+        },
+        {
+          icon: 'el-icon-setting',
+          index: '5',
+          title: '订单中心',
+          subs: [
+              {
+                  index: 'orders',
+                  title: '订单列表',
+              },
+          ]
+        },
+        {
+          icon: 'el-icon-setting',
+          index: '6',
+          title: '商品中心',
+          subs: [
+              {
+                  index: 'goods',
+                  title: '商品列表',
+              },
+              {
+                  index: 'goodsCategory',
+                  title: '商品分类列表',
+              },
+          ]
+        },
+
+        ]
     }
   },
 }

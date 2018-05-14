@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Goods;
 use App\Models\GoodsCategory;
+use App\Models\Seller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
@@ -19,19 +20,82 @@ class GoodsController extends Controller
     public function goodsCategoryList(Request $request)
     {
         $info = $request->all();
+        Validator::make($info, [
+            'category_name'        => 'nullable',
+            'parent_id'            => 'nullable|numeric',
+            'parent_category_name' => 'nullable',
+            'seller_name'          => 'nullable',
+            'shop_name'            => 'nullable',
+            'status'               => 'nullable|boolean',
+            'page'                 => 'nullable|integer',
+            'length'               => 'nullable|integer',
+        ])->validate();
 
         $category_query = GoodsCategory::query();
 
+        if (isset($info['category_name']) && !is_null($info['category_name'])){
+            $category_query->where('category_name','like','%'.$info['category_name'].'%');
+        }
         if (isset($info['parent_id']) && !is_null($info['parent_id'])){
             $category_query->where('parent_id',$info['parent_id']);
         }
-        if (isset($info['seller_id']) && !is_null($info['seller_id'])){
-            $category_query->where('seller_id',$info['seller_id']);
+        if (isset($info['parent_category_name']) && !is_null($info['parent_category_name'])){
+            $parent_category = GoodsCategory::where('category_name','like','%'.$info['parent_category_name'].'%')->get();
+            $category_id = [];
+            if ($parent_category){
+                foreach ($parent_category as $v){
+                    $category_id[] = $v['category_id'];
+                }
+            }
+            $category_query->whereIn('parent_id',$category_id);
+        }
+        if (isset($info['seller_name']) && !is_null($info['seller_name'])){
+            $seller = Seller::where('username','like','%'.$info['seller_name'].'%')->get();
+            $seller_id = [];
+            if ($seller){
+                foreach ($seller as $v){
+                    $seller_id[] = $v['id'];
+                }
+            }
+            $category_query->whereIn('seller_id',$seller_id);
+        }
+        if (isset($info['shop_name']) && !is_null($info['shop_name'])){
+            $seller = Seller::where('shop_name','like','%'.$info['shop_name'].'%')->get();
+            $seller_id = [];
+            if ($seller){
+                foreach ($seller as $v){
+                    $seller_id[] = $v['id'];
+                }
+            }
+            $category_query->whereIn('seller_id',$seller_id);
+        }
+        if (isset($info['status']) && !is_null($info['status'])){
+            $category_query->where('status',$info['status']);
         }
 
+        $limit = (isset($info['length']) && $info['length']) ? $info['length'] : 10;
+        $offset = (isset($info['page']) && $info['page']) ? ($info['page']-1)*$info['length'] : 0;
 
-        $category = $category_query->orderBy('sort','asc')->get();
-        $data = $category;
+        $category = $category_query->offset($offset)->limit($limit)->orderBy('sort','asc')->get();
+        //拼接好父分类和子分类：父分类/子分类
+        foreach ($category as $v){
+            $parent_id_path = explode('_',$v['parent_id_path']);
+            if ($parent_id_path[0] == 0){
+                $v['category_name'] = $v['category_name'].'/';
+            }else{
+                $parent_id_path_name = GoodsCategory::find($parent_id_path[0]);
+                if ($parent_id_path_name){
+                    $v['category_name'] = $parent_id_path_name['category_name'].'/'.$v['category_name'];
+                }else{
+                    $v['category_name'] = '*/'.$v['category_name'];
+                }
+            }
+            $seller = Seller::find($v['seller_id']);
+            $v['seller_name'] = $seller['username'];
+            $v['shop_name'] = $seller['shop_name'];
+        }
+        $total = $category_query->count();
+        $data = ['total' => $total,'data' => $category];
         return Common::jsonFormat('200','获取成功',$data);
     }
 
@@ -155,13 +219,16 @@ class GoodsController extends Controller
     {
         $info = $request->all();
         Validator::make($info, [
-            'category_id'   => 'nullable|numeric',
             'goods_name'    => 'nullable',
+            'first_category_id'=> 'nullable|numeric',
+            'second_category_id'=> 'nullable|numeric',
+            'seller_name'   => 'nullable',
+            'shop_name'     => 'nullable',
             'goods_tag'     => 'nullable|numeric',
-            'status'        => 'nullable|integer',
             'is_hot'        => 'nullable|boolean',
+            'status'        => 'nullable|integer',
             'offset'        => 'nullable|boolean',
-            'limit'        => 'nullable|boolean',
+            'limit'         => 'nullable|boolean',
         ])->validate();
 
         $limit = (isset($info['limit']) && !is_null($info['limit'])) ? $info['limit'] : 10;
@@ -169,23 +236,85 @@ class GoodsController extends Controller
 
         $goods_query = Goods::query();
 
-        if (isset($info['category_id']) && !is_null($info['category_id'])){
-            $goods_query = $goods_query->where('category_id',$info['category_id']);
-        }
         if (isset($info['goods_name']) && !is_null($info['goods_name'])){
-            $goods_query = $goods_query->where(['goods_name','like','%'.$info['goods_name'].'%']);
+            $goods_query->where('goods_name','like','%'.$info['goods_name'].'%');
+        }
+        //查询出一级分类下的商品以及其子分类下的商品
+        if (isset($info['first_category_id']) && !is_null($info['first_category_id'])){
+            $child_category_id = [];
+            //判断二级分类是否为空
+            if (isset($info['second_category_id']) && !is_null($info['second_category_id'])){
+                $category_id = $info['second_category_id'];
+            }else{//为空则只查一级分类下的和其子类下的
+                $category_id = $info['first_category_id'];
+                $child_category = GoodsCategory::where('parent_id',$info['first_category_id'])->get();
+                //判断此一级分类下面是否有子分类，有的话取出其子分类的分类id
+                if ($child_category){
+                    foreach ($child_category as $v){
+                        $child_category_id[] = $v['category_id'];
+                    }
+                }
+            }
+            //如果有子类，则用orwhere查出一级分类及其子类
+            if ($child_category_id){
+                $goods_query->where('category_id',$category_id)->orWhereIn('category_id',$child_category_id);
+            }else{
+                $goods_query->where('category_id',$category_id);
+            }
+        }
+        if (isset($info['seller_name']) && !is_null($info['seller_name'])){
+            //先模糊查询出符合条件的商家id
+            $seller = Seller::where('username','like','%'.$info['seller_name'].'%')->get();
+            if ($seller){
+                $seller_id = [];
+                foreach ($seller as $v){
+                    $seller_id[] = $v['id'];
+                }
+                $goods_query->whereIn('seller_id',$seller_id);
+            }
+        }
+        if (isset($info['shop_name']) && !is_null($info['shop_name'])){
+            //先模糊查询出符合条件的商家id
+            $seller = Seller::where('shop_name','like','%'.$info['shop_name'].'%')->get();
+            if ($seller){
+                $seller_id = [];
+                foreach ($seller as $v){
+                    $seller_id[] = $v['id'];
+                }
+                $goods_query->whereIn('seller_id',$seller_id);
+            }
         }
         if (isset($info['goods_tag']) && !is_null($info['goods_tag'])){
-            $goods_query = $goods_query->where('goods_tag',$info['goods_tag']);
-        }
-        if (isset($info['status']) && !is_null($info['status'])){
-            $goods_query = $goods_query->where('status',$info['status']);
+            $goods_query->where('goods_tag',$info['goods_tag']);
         }
         if (isset($info['is_hot']) && !is_null($info['is_hot'])){
-            $goods_query = $goods_query->where('is_hot',$info['is_hot']);
+            $goods_query->where('is_hot',$info['is_hot']);
+        }
+        if (isset($info['status']) && !is_null($info['status'])){
+            $goods_query->where('status',$info['status']);
         }
 
-        $goods = $goods_query->offset($offset)->limit($limit)->orderBy('sort','asc')->get()->toArray();
+        $goods = $goods_query->offset($offset)->limit($limit)->orderBy('sort','asc')->get();
+
+        foreach ($goods as $v){
+            $v['goods_tag'] = Common::goodsTag($v['goods_tag']);
+            $v['is_hot'] = $v['is_hot'] ? '热门' : '非热门';
+            $seller = Seller::find($v['seller_id']);
+            $v['seller_name'] = $seller ? $seller['username'] : $v['seller_id'];
+            $v['shop_name'] = $seller ? $seller['shop_name'] : '';
+            $category = GoodsCategory::find($v['category_id']);
+            if ($category){
+                $category_path = explode('_',$category['parent_id_path']);
+                if ($category_path[0] == 0){
+                    $category_name = $category['category_name'];
+                }else{
+                    $category_path_name = GoodsCategory::find($category_path[0]);
+                    $category_name = $category_path_name['category_name'].'/'.$category['category_name'];
+                }
+            }
+
+            $v['category_name'] = $category ? $category_name : '';
+        }
         $total = $goods_query->count();
         $data = ['total' => $total,$goods];
 
@@ -274,8 +403,10 @@ class GoodsController extends Controller
 
         }else{ //添加商品
             Validator::make($info, [
-                'category_id'   => 'required|numeric',
+                'first_category_id'=> 'required|numeric',
+                'second_category_id'=> 'nullable|numeric',
                 'goods_name'    => 'required',
+                'seller_id'     => 'required|numeric',
                 'goods_summary' => 'required',
                 'sell_price'    => 'required|numeric',
                 'goods_tag'     => 'required|numeric',
@@ -288,11 +419,16 @@ class GoodsController extends Controller
                 'goods_img'     => 'required',
             ])->validate();
 
+            $seller = Seller::find($info['seller_id']);
+            if (!$seller){
+                return Common::jsonFormat('500','此商家不存在');
+            }
             try{
                 $goods = new Goods;
                 $goods->goods_id = Common::createBigIntId();
-                $goods->category_id = $info['category_id'];
+                $goods->category_id = (isset($info['second_category_id']) && !is_null($info['second_category_id'])) ? $info['second_category_id'] : $info['first_category_id'];
                 $goods->goods_name = $info['goods_name'];
+                $goods->seller_id = $info['seller_id'];
                 $goods->goods_summary = $info['goods_summary'];
                 $goods->sell_price = $info['sell_price'];
                 $goods->goods_tag = $info['goods_tag'];
@@ -328,7 +464,7 @@ class GoodsController extends Controller
         if ($data){
             return Common::jsonFormat('200','获取成功',$data);
         }else{
-            return Common::jsonFormat('500','获取失败');
+            return Common::jsonFormat('500','商品不存在');
         }
     }
 

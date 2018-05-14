@@ -56,21 +56,35 @@ h2{ margin:0; padding:25px 0; }
                 </div>
             </li>
             <li>
-	            <h3>Banner</h3>
-                <div class="item-doc">
-                    <h5>Banner列表: <small class="link">/api/banner/bannerList</small></h5>
-                    <form role="form" action="/api/banner/bannerList">
-                        <input type="hidden" name="_token" value="<?php echo csrf_token(); ?>" />
-                        <button type="submit" class="btn btn-primary">Submit</button>
-                    </form>
-                </div>
-            </li>
-            <li>
                 <h3>订单</h3>
                 <div class="item-doc">
                     <h5>订单列表: <small class="link">/api/home/orderList</small></h5>
                     <form role="form" action="/api/home/orderList">
                         <input type="hidden" name="_token" value="<?php echo csrf_token(); ?>" />
+                        <div class="input-group">
+                            <span class="input-group-addon">id</span><input name="id" placeholder="订单id" value="" type="text" class="form-control">
+                        </div>
+                        <div class="input-group">
+                            <span class="input-group-addon">user_id</span><input name="user_id" placeholder="用户id" value="" type="text" class="form-control">
+                        </div>
+                        <div class="input-group">
+                            <span class="input-group-addon">user_name</span><input name="user_name" placeholder="用户姓名" value="" type="text" class="form-control">
+                        </div>
+                        <div class="input-group">
+                            <span class="input-group-addon">goods_name</span><input name="goods_name" placeholder="产品名称" value="" type="text" class="form-control">
+                        </div>
+                        <div class="input-group">
+                            <span class="input-group-addon">order_time</span><input name="order_time" placeholder="下单时间" value="" type="text" class="form-control">
+                        </div>
+                        <div class="input-group">
+                            <span class="input-group-addon">order_status</span><input name="order_status" placeholder="订单状态" value="" type="text" class="form-control">
+                        </div>
+                        <div class="input-group">
+                            <span class="input-group-addon">page</span><input name="page" placeholder="页数" value="" type="text" class="form-control">
+                        </div>
+                        <div class="input-group">
+                            <span class="input-group-addon">length</span><input name="length" placeholder="条数" value="" type="text" class="form-control">
+                        </div>
                         <button type="submit" class="btn btn-primary">Submit</button>
                     </form>
                 </div>
@@ -117,10 +131,25 @@ h2{ margin:0; padding:25px 0; }
                     <form role="form" action="/api/manage/goodsCategoryList">
                         <input type="hidden" name="_token" value="<?php echo csrf_token(); ?>" />
                         <div class="input-group">
-                            <span class="input-group-addon">parent_id</span><input name="parent_id" placeholder="上级分类id" value="" type="text" class="form-control">
+                            <span class="input-group-addon">category_name</span><input name="category_name" placeholder="分类名称" value="" type="text" class="form-control">
                         </div>
                         <div class="input-group">
-                            <span class="input-group-addon">seller_id</span><input name="seller_id" placeholder="商家id" value="" type="text" class="form-control">
+                            <span class="input-group-addon">parent_category_name</span><input name="parent_category_name" placeholder="上级分类名称" value="" type="text" class="form-control">
+                        </div>
+                        <div class="input-group">
+                            <span class="input-group-addon">seller_name</span><input name="seller_name" placeholder="商家姓名" value="" type="text" class="form-control">
+                        </div>
+                        <div class="input-group">
+                            <span class="input-group-addon">shop_name</span><input name="shop_name" placeholder="店铺名称" value="" type="text" class="form-control">
+                        </div>
+                        <div class="input-group">
+                            <span class="input-group-addon">status</span><input name="status" placeholder="状态" value="" type="text" class="form-control">
+                        </div>
+                        <div class="input-group">
+                            <span class="input-group-addon">page</span><input name="page" placeholder="页数" value="" type="text" class="form-control">
+                        </div>
+                        <div class="input-group">
+                            <span class="input-group-addon">length</span><input name="length" placeholder="条数" value="" type="text" class="form-control">
                         </div>
                         <button type="submit" class="btn btn-primary">Submit</button>
                     </form>
@@ -168,10 +197,31 @@ h2{ margin:0; padding:25px 0; }
                     <form role="form" action="/api/manage/goodsList">
                         <input type="hidden" name="_token" value="<?php echo csrf_token(); ?>" />
                         <div class="input-group">
-                            <span class="input-group-addon">parent_id</span><input name="parent_id" placeholder="上级分类id" value="" type="text" class="form-control">
+                            <span class="input-group-addon">goods_name</span><input name="goods_name" placeholder="产品名称" value="" type="text" class="form-control">
                         </div>
                         <div class="input-group">
-                            <span class="input-group-addon">seller_id</span><input name="seller_id" placeholder="商家id" value="" type="text" class="form-control">
+                            <span class="input-group-addon">first_category_id</span><input name="first_category_id" placeholder="一级分类id" value="" type="text" class="form-control">
+                        </div>
+                        <div class="input-group">
+                            <span class="input-group-addon">second_category_id</span><input name="second_category_id" placeholder="二级分类id" value="" type="text" class="form-control">
+                        </div>
+                        <div class="input-group">
+                            <span class="input-group-addon">seller_name</span><input name="seller_name" placeholder="商家姓名" value="" type="text" class="form-control">
+                        </div>
+                        <div class="input-group">
+                            <span class="input-group-addon">shop_name</span><input name="shop_name" placeholder="店铺名称" value="" type="text" class="form-control">
+                        </div>
+                        <div class="input-group">
+                            <span class="input-group-addon">goods_tag</span><input name="goods_tag" placeholder="产品标签" value="" type="text" class="form-control">
+                        </div>
+                        <div class="input-group">
+                            <span class="input-group-addon">status</span><input name="status" placeholder="产品状态" value="" type="text" class="form-control">
+                        </div>
+                        <div class="input-group">
+                            <span class="input-group-addon">page</span><input name="page" placeholder="页数" value="" type="text" class="form-control">
+                        </div>
+                        <div class="input-group">
+                            <span class="input-group-addon">length</span><input name="length" placeholder="条数" value="" type="text" class="form-control">
                         </div>
                         <button type="submit" class="btn btn-primary">Submit</button>
                     </form>
@@ -188,6 +238,9 @@ h2{ margin:0; padding:25px 0; }
                         </div>
                         <div class="input-group">
                             <span class="input-group-addon">goods_name</span><input name="goods_name" placeholder="产品名称" value="" type="text" class="form-control">
+                        </div>
+                        <div class="input-group">
+                            <span class="input-group-addon">seller_id</span><input name="seller_id" placeholder="商家id" value="" type="text" class="form-control">
                         </div>
                         <div class="input-group">
                             <span class="input-group-addon">goods_summary</span><input name="goods_summary" placeholder="产品简要" value="" type="text" class="form-control">
@@ -253,73 +306,6 @@ h2{ margin:0; padding:25px 0; }
                     <h5>订单状态接口: <small class="link">/api/overseas/orderStatus</small></h5>
                     <form role="form" action="/api/overseas/orderStatus">
                         <input type="hidden" name="_token" value="<?php echo csrf_token(); ?>" />
-                        <button type="submit" class="btn btn-primary">Submit</button>
-                    </form>
-                </div>
-                <div class="item-doc">
-                    <h5>商品分类列表: <small class="link">/api/overseas/getGoodsCategory</small></h5>
-                    <form role="form" action="/api/overseas/getGoodsCategory">
-                        <input type="hidden" name="_token" value="<?php echo csrf_token(); ?>" />
-                        <div class="input-group">
-                            <span class="input-group-addon">parent_id</span><input name="parent_id" placeholder="上级分类id" value="" type="text" class="form-control">
-                        </div>
-                        <button type="submit" class="btn btn-primary">Submit</button>
-                    </form>
-                </div>
-                <div class="item-doc">
-                    <h5>热点商品列表: <small class="link">/api/overseas/goodsList</small></h5>
-                    <form role="form" action="/api/overseas/goodsList">
-                        <input type="hidden" name="_token" value="<?php echo csrf_token(); ?>" />
-                        <div class="input-group">
-                            <span class="input-group-addon">is_hot</span><input name="is_hot" placeholder="是否热门(1热门，0不热门)" value="" type="text" class="form-control">
-                        </div>
-                        <div class="input-group">
-                            <span class="input-group-addon">status</span><input name="status" placeholder="产品状态，0下架，1上架" value="" type="text" class="form-control">
-                        </div>
-                        <div class="input-group">
-                            <span class="input-group-addon">offset</span><input name="offset" placeholder="偏移量" value="" type="text" class="form-control">
-                        </div>
-                        <div class="input-group">
-                            <span class="input-group-addon">length</span><input name="length" placeholder="条数" value="" type="text" class="form-control">
-                        </div>
-                        <div class="input-group">
-                            <p>此处is_hot,status需要传固定值1</p>
-                        </div>
-                        <button type="submit" class="btn btn-primary">Submit</button>
-                    </form>
-                </div>
-                <div class="item-doc">
-                    <h5>商品列表: <small class="link">/api/overseas/goodsList</small></h5>
-                    <form role="form" action="/api/overseas/goodsList">
-                        <input type="hidden" name="_token" value="<?php echo csrf_token(); ?>" />
-                        <div class="input-group">
-                            <span class="input-group-addon">first_category_id</span><input name="first_category_id" placeholder="一级分类id" value="" type="text" class="form-control">
-                        </div>
-                        <div class="input-group">
-                            <span class="input-group-addon">second_category_id</span><input name="second_category_id" placeholder="一级分类id" value="" type="text" class="form-control">
-                        </div>
-                        <div class="input-group">
-                            <span class="input-group-addon">status</span><input name="status" placeholder="产品状态，0下架，1上架" value="" type="text" class="form-control">
-                        </div>
-                        <div class="input-group">
-                            <span class="input-group-addon">offset</span><input name="offset" placeholder="偏移量" value="" type="text" class="form-control">
-                        </div>
-                        <div class="input-group">
-                            <span class="input-group-addon">length</span><input name="length" placeholder="条数" value="" type="text" class="form-control">
-                        </div>
-                        <div class="input-group">
-                            <p>此处status需要传固定值1，second_category_id传-1</p>
-                        </div>
-                        <button type="submit" class="btn btn-primary">Submit</button>
-                    </form>
-                </div>
-                <div class="item-doc">
-                    <h5>商品详情: <small class="link">/api/overseas/goodsDetail</small></h5>
-                    <form role="form" action="/api/overseas/goodsDetail">
-                        <input type="hidden" name="_token" value="<?php echo csrf_token(); ?>" />
-                        <div class="input-group">
-                            <span class="input-group-addon">goods_id</span><input name="goods_id" placeholder="商品id" value="" type="text" class="form-control">
-                        </div>
                         <button type="submit" class="btn btn-primary">Submit</button>
                     </form>
                 </div>
@@ -398,19 +384,6 @@ h2{ margin:0; padding:25px 0; }
                         <input type="hidden" name="_token" value="<?php echo csrf_token(); ?>" />
                         <div class="input-group">
                             <span class="input-group-addon">order_id</span><input name="order_id" placeholder="订单id" value="" type="text" class="form-control">
-                        </div>
-                        <button type="submit" class="btn btn-primary">Submit</button>
-                    </form>
-                </div>
-                <div class="item-doc">
-                    <h5>用户注册: <small class="link">/api/overseas/userRegister</small></h5>
-                    <form role="form" action="/api/overseas/userRegister">
-                        <input type="hidden" name="_token" value="<?php echo csrf_token(); ?>" />
-                        <div class="input-group">
-                            <span class="input-group-addon">openid</span><input name="openid" placeholder="微信openid" value="" type="text" class="form-control">
-                        </div>
-                        <div class="input-group">
-                            <span class="input-group-addon">nickname</span><input name="nickname" placeholder="昵称" value="" type="text" class="form-control">
                         </div>
                         <button type="submit" class="btn btn-primary">Submit</button>
                     </form>
@@ -555,19 +528,16 @@ h2{ margin:0; padding:25px 0; }
                             <span class="input-group-addon">username</span><input name="username" placeholder="商户姓名" value="" type="text" class="form-control">
                         </div>
                         <div class="input-group">
-                            <span class="input-group-addon">password</span><input name="password" placeholder="密码" value="" type="text" class="form-control">
+                            <span class="input-group-addon">shop_name</span><input name="shop_name" placeholder="店铺名称" value="" type="text" class="form-control">
                         </div>
                         <div class="input-group">
-                            <span class="input-group-addon">password_confirmation</span><input name="password_confirmation" placeholder="密码确认" value="" type="text" class="form-control">
+                            <span class="input-group-addon">status</span><input name="status" placeholder="条数" value="" type="text" class="form-control">
                         </div>
                         <div class="input-group">
-                            <span class="input-group-addon">address</span><input name="address" placeholder="店铺地址" value="" type="text" class="form-control">
+                            <span class="input-group-addon">page</span><input name="page" placeholder="页数" value="" type="text" class="form-control">
                         </div>
                         <div class="input-group">
-                            <span class="input-group-addon">shop_name</span><input name="shop_name" placeholder="头像" value="" type="店铺名称" class="form-control">
-                        </div>
-                        <div class="input-group">
-                            <span class="input-group-addon">shop_logo</span><input name="shop_logo" placeholder="店铺头像" value="" type="text" class="form-control">
+                            <span class="input-group-addon">length</span><input name="length" placeholder="条数" value="" type="text" class="form-control">
                         </div>
                         <button type="submit" class="btn btn-primary">Submit</button>
                     </form>
@@ -592,10 +562,13 @@ h2{ margin:0; padding:25px 0; }
                             <span class="input-group-addon">address</span><input name="address" placeholder="店铺地址" value="" type="text" class="form-control">
                         </div>
                         <div class="input-group">
-                            <span class="input-group-addon">shop_name</span><input name="shop_name" placeholder="头像" value="" type="店铺名称" class="form-control">
+                            <span class="input-group-addon">shop_name</span><input name="shop_name" placeholder="店铺名称" value="" type="text" class="form-control">
                         </div>
                         <div class="input-group">
                             <span class="input-group-addon">shop_logo</span><input name="shop_logo" placeholder="店铺头像" value="" type="text" class="form-control">
+                        </div>
+                        <div class="input-group">
+                            <span class="input-group-addon">status</span><input name="status" placeholder="商家状态" value="" type="text" class="form-control">
                         </div>
                         <button type="submit" class="btn btn-primary">Submit</button>
                     </form>
@@ -644,6 +617,25 @@ h2{ margin:0; padding:25px 0; }
                         <button type="submit" class="btn btn-primary">Submit</button>
                     </form>
                 </div>
+            </li>
+            <li>
+                <h3>微信相关</h3>
+                <div class="item-doc">
+                    <h5>微信支付: <small class="link">/api/wechat/wxPay</small></h5>
+                    <form role="form" action="/api/wechat/wxPay">
+                        <input type="hidden" name="_token" value="<?php echo csrf_token(); ?>" />
+                        <div class="input-group">
+                            <span class="input-group-addon">open_id</span><input name="open_id" placeholder="微信open_id" value="" type="text" class="form-control">
+                        </div>
+                        <div class="input-group">
+                            <span class="input-group-addon">order_id</span><input name="order_id" placeholder="订单id" value="" type="text" class="form-control">
+                        </div>
+                        <button type="submit" class="btn btn-primary">Submit</button>
+                    </form>
+                </div>
+
+
+
             </li>
 
          </ul>

@@ -23,6 +23,7 @@ class SellerController extends Controller
             'user_mobile' => 'nullable|numeric',
             'username' => 'nullable',
             'shop_name' => 'nullable',
+            'status' => 'nullable|boolean',
             'page' => 'nullable|integer',
             'length' => 'nullable|integer',
         ])->validate();
@@ -32,10 +33,13 @@ class SellerController extends Controller
             $seller_query->where('user_mobile',$info['user_mobile']);
         }
         if (isset($info['username']) && $info['username']){
-            $seller_query->where('username',$info['username']);
+            $seller_query->where('username','like','%'.$info['username'].'%');
         }
         if (isset($info['shop_name']) && $info['shop_name']){
-            $seller_query->where('shop_name',$info['shop_name']);
+            $seller_query->where('shop_name','like','%'.$info['shop_name'].'%');
+        }
+        if (isset($info['status']) && !is_null($info['status'])){
+            $seller_query->where('status',$info['status']);
         }
 
         $limit = (isset($info['length']) && $info['length']) ? $info['length'] : 10;
@@ -63,12 +67,13 @@ class SellerController extends Controller
         $info = $request->all();
         Validator::make($info, [
             'user_mobile' => 'required|numeric',
-            'username' => 'required',
-            'password' => 'required|confirmed',
+            'username'    => 'required',
+            'password'    => 'required|confirmed',
             'password_confirmation' => 'required',
-            'address' => 'required',
-            'shop_name' => 'required|max:100',
-            'shop_logo' => 'required',
+            'address'     => 'required',
+            'shop_name'   => 'required|max:100',
+            'shop_logo'   => 'required',
+            'status'      => 'required|boolean',
         ])->validate();
 
         $is_exist = Seller::where('user_mobile',$info['user_mobile'])->first();
@@ -86,7 +91,7 @@ class SellerController extends Controller
             $seller->address = $info['address'];
             $seller->shop_name = $info['shop_name'];
             $seller->shop_logo = $info['shop_logo'];
-            $seller->status = 1;
+            $seller->status = $info['status'];
             $seller->save();
 
             return Common::jsonFormat('200','注册成功');
