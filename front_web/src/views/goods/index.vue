@@ -70,13 +70,13 @@
             <el-table :data="tableData" border style="width: 100%">
                 <el-table-column prop="goods_id" label="商品id">
                 </el-table-column>
+                <el-table-column prop="goods_name" label="商品名称">
+                </el-table-column>
                 <el-table-column prop="category_name" label="分类">
                 </el-table-column>
                 <el-table-column prop="seller_name" label="商家姓名">
                 </el-table-column>
                 <el-table-column prop="shop_name" label="店铺名称">
-                </el-table-column>
-                <el-table-column prop="goods_name" label="商品名称">
                 </el-table-column>
                 <el-table-column prop="sell_price" label="售价">
                 </el-table-column>
@@ -95,8 +95,8 @@
                 </el-table-column>
                 <el-table-column label="操作" width="250">
                     <template slot-scope="scope">
-                        <el-button v-if="scope.row.status === 0" size="small" @click="changeStatus(scope.row.d,1)">上架</el-button>
-                        <el-button v-else-if="scope.row.status === 1" size="small" @click="changeStatus(scope.row.id,0)">下架</el-button>
+                        <el-button v-if="scope.row.status === 0" size="small" @click="changeStatus(scope.row.goods_id,1)">上架</el-button>
+                        <el-button v-else-if="scope.row.status === 1" size="small" @click="changeStatus(scope.row.goods_id,0)">下架</el-button>
                         <el-button size="small" @click="editpt(scope.row.goods_id)">编辑</el-button>
                         <el-button size="small" type="danger" @click="deleteorder(scope.row.goods_id)">删除</el-button>
                     </template>
@@ -117,8 +117,8 @@
 
 <script>
     import addgoods from './components/addgoods';
-//    import editproduct from './components/editProduct';
-    import { getlist,getgoodstag,getcategorylist } from "@/api/goods.js";
+    import editgoods from './components/editgoods';
+    import { getlist,getGoodsTag,getcategorylist } from "@/api/goods.js";
     export default {
         data() {
             return {
@@ -146,17 +146,17 @@
                 cur_page: 1,
                 addshow:false,
                 editshow:false,
-                id:'',
+                goods_id:'',
             }
         },
         created(){
             this.getData();
-            this.getGoodsTag();
             this.firstCategory();
+            this.goodsTag();
         },
         components: {
             addgoods,
-//            editproduct,
+            editgoods,
         },
         mounted() {
 
@@ -165,8 +165,8 @@
             addpt(){
                 this.addshow = true;
             },
-            editpt(id){
-                this.id = id;
+            editpt(goods_id){
+                this.goods_id = goods_id;
                 this.editshow = true;
             },
             handleCurrentChange(val){
@@ -238,7 +238,7 @@
             },
             firstCategory(){
                 getcategorylist(0).then(res => {
-                    console.log(res.data.data.data)
+//                    console.log(res.data.data.data)
                     this.firstOptions = res.data.data.data;
                 }).catch(err => {
                     console.log(error)
@@ -253,14 +253,14 @@
                     console.log(error)
                 })
             },
-            getGoodsTag(){
-                getgoodstag().then(res => {
+            goodsTag(){
+                getGoodsTag().then(res => {
 //                    console.log(res.data.data)
-                    this.goodsTagOptions = res.data.data
+                    this.goodsTagOptions = res.data.data;
                 }).catch (err => {
                     console.log(error)
                 })
-            }
+            },
         }
     }
 </script>

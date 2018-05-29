@@ -80,7 +80,7 @@ h2{ margin:0; padding:25px 0; }
                             <span class="input-group-addon">order_status</span><input name="order_status" placeholder="订单状态" value="" type="text" class="form-control">
                         </div>
                         <div class="input-group">
-                            <span class="input-group-addon">page</span><input name="page" placeholder="页数" value="" type="text" class="form-control">
+                            <span class="input-group-addon">page_num</span><input name="page_num" placeholder="当前页数" value="" type="text" class="form-control">
                         </div>
                         <div class="input-group">
                             <span class="input-group-addon">length</span><input name="length" placeholder="条数" value="" type="text" class="form-control">
@@ -146,11 +146,18 @@ h2{ margin:0; padding:25px 0; }
                             <span class="input-group-addon">status</span><input name="status" placeholder="状态" value="" type="text" class="form-control">
                         </div>
                         <div class="input-group">
-                            <span class="input-group-addon">page</span><input name="page" placeholder="页数" value="" type="text" class="form-control">
+                            <span class="input-group-addon">page_num</span><input name="page_num" placeholder="当前页数" value="" type="text" class="form-control">
                         </div>
                         <div class="input-group">
                             <span class="input-group-addon">length</span><input name="length" placeholder="条数" value="" type="text" class="form-control">
                         </div>
+                        <button type="submit" class="btn btn-primary">Submit</button>
+                    </form>
+                </div>
+                <div class="item-doc">
+                    <h5>获取所有商品分类: <small class="link">/api/manage/getGoodsCategoryList</small></h5>
+                    <form role="form" action="/api/manage/getGoodsCategoryList">
+                        <input type="hidden" name="_token" value="<?php echo csrf_token(); ?>" />
                         <button type="submit" class="btn btn-primary">Submit</button>
                     </form>
                 </div>
@@ -218,7 +225,7 @@ h2{ margin:0; padding:25px 0; }
                             <span class="input-group-addon">status</span><input name="status" placeholder="产品状态" value="" type="text" class="form-control">
                         </div>
                         <div class="input-group">
-                            <span class="input-group-addon">page</span><input name="page" placeholder="页数" value="" type="text" class="form-control">
+                            <span class="input-group-addon">page_num</span><input name="page_num" placeholder="当前页数" value="" type="text" class="form-control">
                         </div>
                         <div class="input-group">
                             <span class="input-group-addon">length</span><input name="length" placeholder="条数" value="" type="text" class="form-control">
@@ -405,6 +412,9 @@ h2{ margin:0; padding:25px 0; }
                             <span class="input-group-addon">password</span><input name="password" placeholder="密码" value="" type="text" class="form-control">
                         </div>
                         <div class="input-group">
+                            <span class="input-group-addon">password_confirmation</span><input name="password_confirmation" placeholder="密码确认" value="" type="text" class="form-control">
+                        </div>
+                        <div class="input-group">
                             <span class="input-group-addon">email</span><input name="email" placeholder="邮箱" value="" type="text" class="form-control">
                         </div>
                         <div class="input-group">
@@ -412,6 +422,9 @@ h2{ margin:0; padding:25px 0; }
                         </div>
                         <div class="input-group">
                             <span class="input-group-addon">open_id</span><input name="open_id" placeholder="微信open_id" value="" type="text" class="form-control">
+                        </div>
+                        <div class="input-group">
+                            <span class="input-group-addon">status</span><input name="status" placeholder="状态" value="" type="text" class="form-control">
                         </div>
                         <button type="submit" class="btn btn-primary">Submit</button>
                     </form>
@@ -534,7 +547,7 @@ h2{ margin:0; padding:25px 0; }
                             <span class="input-group-addon">status</span><input name="status" placeholder="条数" value="" type="text" class="form-control">
                         </div>
                         <div class="input-group">
-                            <span class="input-group-addon">page</span><input name="page" placeholder="页数" value="" type="text" class="form-control">
+                            <span class="input-group-addon">page_num</span><input name="page_num" placeholder="当前页数" value="" type="text" class="form-control">
                         </div>
                         <div class="input-group">
                             <span class="input-group-addon">length</span><input name="length" placeholder="条数" value="" type="text" class="form-control">

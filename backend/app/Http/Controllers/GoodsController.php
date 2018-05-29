@@ -24,10 +24,11 @@ class GoodsController extends Controller
             'category_name'        => 'nullable',
             'parent_id'            => 'nullable|numeric',
             'parent_category_name' => 'nullable',
+            'seller_id'            => 'nullable',
             'seller_name'          => 'nullable',
             'shop_name'            => 'nullable',
             'status'               => 'nullable|boolean',
-            'page'                 => 'nullable|integer',
+            'page_num'             => 'nullable|integer',
             'length'               => 'nullable|integer',
         ])->validate();
 
@@ -48,6 +49,9 @@ class GoodsController extends Controller
                 }
             }
             $category_query->whereIn('parent_id',$category_id);
+        }
+        if (isset($info['seller_id']) && !is_null($info['seller_id'])){
+            $category_query->where('seller_id',$info['seller_id']);
         }
         if (isset($info['seller_name']) && !is_null($info['seller_name'])){
             $seller = Seller::where('username','like','%'.$info['seller_name'].'%')->get();
@@ -73,27 +77,20 @@ class GoodsController extends Controller
             $category_query->where('status',$info['status']);
         }
 
-        $limit = (isset($info['length']) && $info['length']) ? $info['length'] : 10;
-        $offset = (isset($info['page']) && $info['page']) ? ($info['page']-1)*$info['length'] : 0;
+        $limit = (isset($info['length']) && !is_null($info['length'])) ? $info['length'] : 10;
+        $offset = (isset($info['page_num']) && !is_null($info['page_num'])) ? ($info['page_num']-1)*$limit : 0;
 
         $category = $category_query->offset($offset)->limit($limit)->orderBy('sort','asc')->get();
-        //拼接好父分类和子分类：父分类/子分类
-        foreach ($category as $v){
-            $parent_id_path = explode('_',$v['parent_id_path']);
-            if ($parent_id_path[0] == 0){
-                $v['category_name'] = $v['category_name'].'/';
-            }else{
-                $parent_id_path_name = GoodsCategory::find($parent_id_path[0]);
-                if ($parent_id_path_name){
-                    $v['category_name'] = $parent_id_path_name['category_name'].'/'.$v['category_name'];
-                }else{
-                    $v['category_name'] = '*/'.$v['category_name'];
-                }
+
+        if ($category){
+            //拼接好父分类和子分类：父分类/子分类
+            foreach ($category as $v){
+                $seller = Seller::find($v['seller_id']);
+                $v['seller_name'] = $seller['username'];
+                $v['shop_name'] = $seller['shop_name'];
             }
-            $seller = Seller::find($v['seller_id']);
-            $v['seller_name'] = $seller['username'];
-            $v['shop_name'] = $seller['shop_name'];
         }
+
         $total = $category_query->count();
         $data = ['total' => $total,'data' => $category];
         return Common::jsonFormat('200','获取成功',$data);
@@ -227,21 +224,22 @@ class GoodsController extends Controller
             'goods_tag'     => 'nullable|numeric',
             'is_hot'        => 'nullable|boolean',
             'status'        => 'nullable|integer',
-            'offset'        => 'nullable|boolean',
-            'limit'         => 'nullable|boolean',
+            'page_num'      => 'nullable|integer',
+            'length'        => 'nullable|integer',
         ])->validate();
 
-        $limit = (isset($info['limit']) && !is_null($info['limit'])) ? $info['limit'] : 10;
-        $offset = (isset($info['offset']) && !is_null($info['offset'])) ? ($info['offset']-1)*$limit : 0;
+        $limit = (isset($info['length']) && !is_null($info['length'])) ? $info['length'] : 10;
+        $offset = (isset($info['page_num']) && !is_null($info['page_num'])) ? ($info['page_num']-1)*$limit : 0;
 
         $goods_query = Goods::query();
 
         if (isset($info['goods_name']) && !is_null($info['goods_name'])){
             $goods_query->where('goods_name','like','%'.$info['goods_name'].'%');
         }
+
         //查询出一级分类下的商品以及其子分类下的商品
         if (isset($info['first_category_id']) && !is_null($info['first_category_id'])){
-            $child_category_id = [];
+            $child_category_id[] = $info['first_category_id'];
             //判断二级分类是否为空
             if (isset($info['second_category_id']) && !is_null($info['second_category_id'])){
                 $category_id = $info['second_category_id'];
@@ -255,12 +253,8 @@ class GoodsController extends Controller
                     }
                 }
             }
-            //如果有子类，则用orwhere查出一级分类及其子类
-            if ($child_category_id){
-                $goods_query->where('category_id',$category_id)->orWhereIn('category_id',$child_category_id);
-            }else{
-                $goods_query->where('category_id',$category_id);
-            }
+            //如果有子类，则用whereIn一并查出一级分类及其子类
+            $goods_query->whereIn('category_id',$child_category_id);
         }
         if (isset($info['seller_name']) && !is_null($info['seller_name'])){
             //先模糊查询出符合条件的商家id
@@ -294,27 +288,34 @@ class GoodsController extends Controller
             $goods_query->where('status',$info['status']);
         }
 
+
         $goods = $goods_query->offset($offset)->limit($limit)->orderBy('sort','asc')->get();
 
-        foreach ($goods as $v){
-            $v['goods_tag'] = Common::goodsTag($v['goods_tag']);
-            $v['is_hot'] = $v['is_hot'] ? '热门' : '非热门';
-            $seller = Seller::find($v['seller_id']);
-            $v['seller_name'] = $seller ? $seller['username'] : $v['seller_id'];
-            $v['shop_name'] = $seller ? $seller['shop_name'] : '';
-            $category = GoodsCategory::find($v['category_id']);
-            if ($category){
-                $category_path = explode('_',$category['parent_id_path']);
-                if ($category_path[0] == 0){
-                    $category_name = $category['category_name'];
-                }else{
-                    $category_path_name = GoodsCategory::find($category_path[0]);
-                    $category_name = $category_path_name['category_name'].'/'.$category['category_name'];
-                }
-            }
+        if ($goods){
+            foreach ($goods as $v){
+                $v['goods_tag'] = Common::goodsTag($v['goods_tag']);
+                $v['is_hot'] = $v['is_hot'] ? '热门' : '非热门';
+                $seller = Seller::find($v['seller_id']);
+                $v['seller_name'] = $seller ? $seller['username'] : $v['seller_id'];
+                $v['shop_name'] = $seller ? $seller['shop_name'] : '';
 
-            $v['category_name'] = $category ? $category_name : '';
+                $category = GoodsCategory::find($v['category_id']);
+                if ($category){
+                    if ($category['parent_id'] != 0){
+                        $parent = GoodsCategory::find($category['parent_id']);
+                        $parent_name = '';
+                        if ($parent){
+                            $parent_name = $parent['category_name'];
+                        }
+                        $v['category_name'] = $parent_name.'/'.$category['category_name'];
+                    }else{
+                        $v['category_name'] = $category['category_name'];
+                    }
+                }
+
+            }
         }
+
         $total = $goods_query->count();
         $data = ['total' => $total,$goods];
 
@@ -462,6 +463,19 @@ class GoodsController extends Controller
 
         $data = Goods::find($info['goods_id']);
         if ($data){
+            $data['first_category'] = '';
+            $data['second_category'] = '';
+
+            $category = GoodsCategory::find($data['category_id']);
+            if ($category){
+                if ($category['parent_id'] == 0){
+                    $data['first_category_id'] = $category['category_id'];
+                    $data['second_category_id'] = '';
+                }else{
+                    $data['first_category_id'] = $category['parent_id'];
+                    $data['second_category_id'] = $category['category_id'];
+                }
+            }
             return Common::jsonFormat('200','获取成功',$data);
         }else{
             return Common::jsonFormat('500','商品不存在');

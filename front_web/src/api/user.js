@@ -25,43 +25,20 @@ export function modify(goods_id,status) {
         }
     })
 }
-//获取产品分类一二级菜单
-export function getcategorylist(parent_id) {
+//添加用户
+export function adduser(name,tel,password,password_confirmation,email,icon,status,open_id) {
     return fetch({
-        url: '/overseas/getGoodsCategory',
+        url: '/home/userRegister',
         method: 'post',
         data: {
-            parent_id
-        }
-    })
-}
-//添加产品
-export function addproduct(first_category_id,second_category_id,goods_name,goods_summary,hospital_name,hospital_summary,hospital_city,sell_price,front_money,specialty,status,share_title,share_content,sort,is_hot,hot_sort,goods_tag,list_img,main_img,hot_img,goods_desc) {
-    return fetch({
-        url: '/overseas/goodsModify',
-        method: 'post',
-        data: {
-            first_category_id,
-            second_category_id,
-            goods_name,
-            goods_summary,
-            hospital_name,
-            hospital_summary,
-            hospital_city,
-            sell_price,
-            front_money,
-            specialty,
+            name,
+            tel,
+            password,
+            password_confirmation,
+            email,
+            icon,
             status,
-            share_title,
-            share_content,
-            sort,
-            is_hot,
-            hot_sort,
-            goods_tag,
-            list_img,
-            main_img,
-            hot_img,
-            goods_desc
+            open_id
         }
     })
 }

@@ -87,6 +87,7 @@ Route::group(['prefix' => 'home'], function(){
 //后台接口
 Route::group(['prefix' => 'manage'], function(){
     Route::post('goodsCategoryList', 'GoodsController@goodsCategoryList')->name('goods.goodsCategoryList');
+    Route::post('getGoodsCategoryList', 'Common@getGoodsCategoryList')->name('goods.getGoodsCategoryList');
     Route::post('goodsCategoryModify', 'GoodsController@goodsCategoryModify')->name('goods.goodsCategoryModify');
     Route::post('goodsCategoryDelete', 'GoodsController@goodsCategoryDelete')->name('goods.goodsCategoryDelete');
     Route::post('goodsModify', 'GoodsController@goodsModify')->name('goods.goodsModify');

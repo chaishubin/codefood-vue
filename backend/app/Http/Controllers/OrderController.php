@@ -28,7 +28,7 @@ class OrderController extends Controller
             'goods_name'   => 'nullable',
             'order_time'   => 'nullable|array',
             'order_status' => 'nullable|integer',
-            'page'         => 'nullable|integer',
+            'page_num'     => 'nullable|integer',
             'length'       => 'nullable|integer',
         ])->validate();
         $order_query = Order::query();
@@ -68,7 +68,7 @@ class OrderController extends Controller
         }
 
         $limit = (isset($info['length']) && !is_null($info['length'])) ? $info['length'] : 10;
-        $offset = (isset($info['page']) && !is_null($info['page'])) ? ($info['page']-1)*$limit : 0;
+        $offset = (isset($info['page_num']) && !is_null($info['page_num'])) ? ($info['page_num']-1)*$limit : 0;
 
         $order = $order_query->orderBy('order_time','desc')->offset($offset)->limit($limit)->get();
 

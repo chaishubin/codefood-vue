@@ -1,11 +1,11 @@
 import fetch from '@/utils/fetch'
 //获取列表信息
-export function getlist(offset,length,goods_name,first_category_id,second_category_id,seller_name,shop_name,goods_tag,status) {
+export function getlist(page_num,length,goods_name,first_category_id,second_category_id,seller_name,shop_name,goods_tag,status) {
     return fetch({
         url: '/manage/goodsList',
         method: 'post',
         data: {
-            offset,
+            page_num,
             length,
             goods_name,
             first_category_id,
@@ -72,7 +72,7 @@ export function addgoods(first_category_id,second_category_id,seller_id,goods_na
     })
 }
 //编辑产品
-export function editproduct(goods_id,first_category_id,second_category_id,goods_name,goods_summary,hospital_name,hospital_summary,hospital_city,sell_price,front_money,specialty,status,share_title,share_content,sort,is_hot,hot_sort,goods_tag,list_img,main_img,hot_img,goods_desc) {
+export function editgoods(goods_id,first_category_id,second_category_id,goods_name,goods_summary,hospital_name,hospital_summary,hospital_city,sell_price,front_money,specialty,status,share_title,share_content,sort,is_hot,hot_sort,goods_tag,list_img,main_img,hot_img,goods_desc) {
     return fetch({
         url: '/overseas/goodsModify',
         method: 'post',
@@ -105,7 +105,7 @@ export function editproduct(goods_id,first_category_id,second_category_id,goods_
 //获取产品信息
 export function getgoodsinfo(goods_id) {
     return fetch({
-        url: '/overseas/goodsDetail',
+        url: '/manage/goodsDetail',
         method: 'post',
         data: {
             goods_id
@@ -122,3 +122,26 @@ export function goodsdelete(goods_id) {
         }
     })
 }
+// //添加产品分类
+// export function addgoods(first_category_id,second_category_id,seller_id,goods_name,goods_summary,sell_price,sort,status,is_hot,goods_tag,share_title,share_content,goods_img,goods_desc) {
+//     return fetch({
+//         url: '/manage/goodsModify',
+//         method: 'post',
+//         data: {
+//             first_category_id,
+//             second_category_id,
+//             seller_id,
+//             goods_name,
+//             goods_summary,
+//             sell_price,
+//             sort,
+//             status,
+//             is_hot,
+//             goods_tag,
+//             share_title,
+//             share_content,
+//             goods_img,
+//             goods_desc
+//         }
+//     })
+// }

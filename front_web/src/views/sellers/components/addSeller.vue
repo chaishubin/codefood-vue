@@ -136,12 +136,6 @@
                 dialogFormVisible :this.show,
                 imgurl:process.env.BASE_API + '/manage/uploadImg',
                 baseurl:process.env.IMG_API,
-                firstOptions: [
-
-                ],
-                secondOptions: [
-
-                ],
                 form: {
                     user_mobile:'',
                     username:'',
@@ -162,7 +156,7 @@
                     shop_logo: [{required: false, trigger: "blur", validator: imgempty}],
                     status: [{required: true, trigger: "change", validator: selectempty}]
                 },
-            }
+            };
         },
         components:{
 
@@ -188,30 +182,27 @@
             //表单提交
             submitform() {
                 const _this = this;
-                this.$refs.addForm.validate(valid => {
-                    console.log(222);
-//                    console.log(valid);
+//                this.$refs.addForm.validate(valid => {
 //                    if(valid){
-//                        console.log(333);
-//                        addseller(this.form.user_mobile,this.form.username,this.form.password,this.form.password_confirmation,this.form.address,this.form.shop_name,this.form.shop_logo,this.form.status).then(res => {
-//                            console.log(res)
-//                            if(res.data.status == '200'){
-//                                this.$message({
-//                                    showClose: true,
-//                                    message: res.data.msg,
-//                                    type: 'success'
-//                                });
-//                                _this.BcloseDialog();
-//                            }else{
-//                                this.$message({
-//                                    showClose: true,
-//                                    message: res.data.msg,
-//                                    type: 'error'
-//                                });
-//                            }
-//                        }).catch(err => {
-//                            console.log(error)
-//                        })
+                        addseller(this.form.user_mobile,this.form.username,this.form.password,this.form.password_confirmation,this.form.address,this.form.shop_name,this.form.shop_logo,this.form.status).then(res => {
+                            console.log(res)
+                            if(res.data.status == '200'){
+                                this.$message({
+                                    showClose: true,
+                                    message: res.data.msg,
+                                    type: 'success'
+                                });
+                                _this.BcloseDialog();
+                            }else{
+                                this.$message({
+                                    showClose: true,
+                                    message: res.data.msg,
+                                    type: 'error'
+                                });
+                            }
+                        }).catch(err => {
+                            console.log(error)
+                        })
 //                    }else{
 //                        this.$message({
 //                            showClose: true,
@@ -219,8 +210,7 @@
 //                            type: 'error'
 //                        });
 //                    }
-
-                });
+//                });
             },
             //表单取消
             closechild(formName) {
@@ -237,15 +227,6 @@
                     this.$emit('closedialog',false);
                 })
                 done;
-            },
-            //是否显示排序
-            isShowSort() {
-                if(this.form.is_hot == '1'){
-                    return true;
-                }else{
-                    this.form.hot_sort = '50';
-                    return false;
-                }
             },
             //图片上传
             shopLogoSuccess(res,file,fileList) {

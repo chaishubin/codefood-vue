@@ -84,13 +84,13 @@
                 </el-row>
             </div>
         </div>
-        <addproduct v-if="addshow" :show.sync="addshow" @closedialog="addChange"></addproduct>
-        <editproduct v-if="editshow" :show.sync="editshow" :category_id.sync="goods_id" @closedialog="editChange"></editproduct>
+        <addcategory v-if="addshow" :show.sync="addshow" @closedialog="addChange"></addcategory>
+        <editcategory v-if="editshow" :show.sync="editshow" :category_id.sync="goods_id" @closedialog="editChange"></editcategory>
     </div>
 </template>
 
 <script>
-//    import addproduct from './components/addProduct';
+    import addcategory from './components/addgoodscategory';
 //    import editproduct from './components/editProduct';
     import { getlist } from "@/api/goodsCategory.js";
     export default {
@@ -116,7 +116,7 @@
             this.getData();
         },
         components: {
-//            addproduct,
+            addcategory,
 //            editproduct,
         },
         mounted() {

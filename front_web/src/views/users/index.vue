@@ -81,13 +81,13 @@
                 </el-row>
             </div>
         </div>
-        <addproduct v-if="addshow" :show.sync="addshow" @closedialog="addChange"></addproduct>
-        <editproduct v-if="editshow" :show.sync="editshow" :id.sync="id" @closedialog="editChange"></editproduct>
+        <adduser v-if="addshow" :show.sync="addshow" @closedialog="addChange"></adduser>
+        <edituser v-if="editshow" :show.sync="editshow" :id.sync="id" @closedialog="editChange"></edituser>
     </div>
 </template>
 
 <script>
-//    import addproduct from './components/addProduct';
+    import adduser from './components/addUser';
 //    import editproduct from './components/editProduct';
     import { getlist } from "@/api/user.js";
     export default {
@@ -119,7 +119,7 @@
 //            this.firstCategory();
         },
         components: {
-//            addproduct,
+            adduser,
 //            editproduct,
         },
         mounted() {

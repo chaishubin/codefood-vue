@@ -24,9 +24,11 @@ class UserController extends Controller
             'name'    => 'nullable|max:100',
             'tel'     => 'required|numeric',
             'email'   => 'nullable',
-            'password'=> 'required',
+            'password'=> 'required|confirmed',
+            'password_confirmation'=> 'required',
             'icon'    => 'nullable',
             'open_id' => 'nullable',
+            'status'  => 'nullable|boolean',
         ])->validate();
 
         $is_exist = User::where('tel',$info['tel'])->first();
@@ -43,7 +45,7 @@ class UserController extends Controller
             $user->password = Common::md5_password($info['password']);
             $user->icon = (isset($info['icon']) && !empty($info['icon'])) ? $info['icon'] : Common::defaultHeadImg();
             $user->open_id = (isset($info['email']) && !empty($info['email'])) ? $info['open_id'] : 0;
-            $user->status = '1';
+            $user->status = (isset($info['status']) && !is_null($info['status'])) ? $info['status'] : 1;;
             $user->session_key = Common::session_key();
             $user->last_login_ip = Common::getClientIp();
             $user->save();
@@ -113,7 +115,7 @@ class UserController extends Controller
             'tel'  => 'nullable|numeric',
             'open_id' => 'nullable|max:100',
             'status' => 'nullable|boolean',
-            'page' => 'nullable|integer',
+            'page_num' => 'nullable|integer',
             'length' => 'nullable|integer',
         ])->validate();
 
@@ -131,8 +133,8 @@ class UserController extends Controller
         if (isset($info['status']) && !is_null($info['status'])){
             $user_query->where('status',$info['status']);
         }
-        $limit = (isset($info['length']) && $info['length']) ? $info['length'] : 10;
-        $offset = (isset($info['page']) && ($info['page']-1)*$limit) ? $info['page'] : 0;
+        $limit = (isset($info['length']) && !is_null($info['length'])) ? $info['length'] : 10;
+        $offset = (isset($info['page_num']) && !is_null($info['page_num'])) ? ($info['page_num']-1)*$limit : 0;
 
         $total = $user_query->count();
         $user = $user_query->offset($offset)->limit($limit)->orderBy('created_at','desc')->get();

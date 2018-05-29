@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\GoodsCategory;
 use Faker\Provider\File;
 use function GuzzleHttp\Psr7\str;
 use Illuminate\Http\Request;
@@ -198,6 +199,31 @@ class Common
         }
         return Common::jsonFormat('200','获取成功',$data);
     }
+
+//    /**
+//     * @return array|\Illuminate\Http\JsonResponse
+//     * 获取所有商品分类列表
+//     */
+//    public static function getGoodsCategoryList()
+//    {
+//        //先取出所有分类
+//        $category = GoodsCategory::orderBy('parent_id_path')->get();
+//        if (!$category){
+//            return [];
+//        }
+//        $category_list = [];
+//        //在通过遍历把所有二级分类的分类名组合起来
+//        foreach ($category as $v){
+//            if ($v['parent_id'] != 0){
+//                $parent = GoodsCategory::find($v['parent_id']);
+//                if ($parent){
+//                    $v['category_name'] = $parent['category_name'].'/'.$v['category_name'];
+//                }
+//            }
+//            $category_list[] = $v;
+//        }
+//        return Common::jsonFormat('200','获取成功',$category_list);
+//    }
 
 
     /**

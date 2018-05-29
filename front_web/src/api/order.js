@@ -1,11 +1,11 @@
 import fetch from '@/utils/fetch'
 //获取列表信息
-export function getlist(offset,length,order_id,user_name,goods_name,order_time,order_status) {
+export function getlist(page_num,length,order_id,user_name,goods_name,order_time,order_status) {
     return fetch({
         url: '/home/orderList',
         method: 'post',
         data: {
-            offset,
+            page_num,
             length,
             order_id,
             user_name,

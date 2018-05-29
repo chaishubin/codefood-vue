@@ -1,7 +1,7 @@
 <template>
-    <div id="addgoods">
+    <div id="editgoods">
         <div class="formwarp">
-            <el-dialog width="80%" top="5vh" :before-close="BcloseDialog" title="添加产品" :visible.sync="dialogFormVisible" :close-on-click-modal="false"
+            <el-dialog width="80%" top="5vh" :before-close="BcloseDialog" title="编辑产品" :visible.sync="dialogFormVisible" :close-on-click-modal="false"
                        :lock-scroll="true">
                 <el-form :model="form" :rules="rules" ref="addForm">
                     <el-row type="flex">
@@ -120,7 +120,7 @@
 
 <script>
     import editor from './editor.vue';
-    import { addgoods,getcategorylist,getGoodsTag } from "@/api/goods.js";
+    import { getgoodsinfo,getcategorylist,editgoods,getGoodsTag } from "@/api/goods.js";
     export default{
         data() {
             const words_20 = (rule, value, callback) => {
@@ -240,18 +240,26 @@
         components:{
             editor
         },
-        props: {
-            show: {
-                type: Boolean,
-                default: false
-            }
-        },
+        props: [
+//            show: {
+//                type: Boolean,
+//                default: false,
+//            }
+            'show',
+            'goods_id'
+        ],
         watch: {
             show () {
+                console.log(this.goods_id)
+                console.log(this.show)
                 this.dialogFormVisible = this.show;
+                if(this.show){
+                    this.getInfo();
+                }
             },
         },
         created(){
+            this.getInfo();
             this.firstCategory();
             this.goodsTag();
         },
@@ -259,6 +267,19 @@
 
         },
         methods: {
+            //获取商品信息
+            getInfo() {
+               console.log(this.goods_id)
+                const _this = this;
+                getgoodsinfo(this.goods_id).then(res => {
+                    console.log(res.data.data;)
+                    var result = res.data.data;
+                    _this.form.first_category_id = 
+
+                }).catch(err => {
+                    console.log(error)
+                });
+            },
             //表单提交
             submitform() {
                 const _this = this;
@@ -310,15 +331,6 @@
                 })
                 done;
             },
-            //是否显示排序
-            isShowSort() {
-                if(this.form.is_hot == '1'){
-                    return true;
-                }else{
-                    this.form.hot_sort = '50';
-                    return false;
-                }
-            },
             //图片上传
             goodsImgSuccess(res,file,fileList) {
                 //this.form.list_img = URL.createObjectURL(file.raw);
@@ -359,7 +371,6 @@
                 })
             },
             goodsTag(){
-                console.log(999999)
                 getGoodsTag().then(res => {
                     console.log(res.data.data)
                     this.goodsTagOptions = res.data.data;
@@ -372,7 +383,7 @@
                 this.form.goods_desc = editorcontent;
                 console.log(this.form.goods_desc)
             }
-        },
+        }
     }
 </script>
 <style>
@@ -412,7 +423,7 @@
 
 </style>
 <style scoped>
-    #addproduct {
+    #editgoods {
         overflow: hidden;
         position: relative;
     }

@@ -6,90 +6,50 @@
                 <el-form :model="form" :rules="rules" ref="addForm">
                     <el-row type="flex">
                         <el-col :span="10" :offset="2">
-                            <el-form-item label="商家id" prop="seller_id">
-                                <el-input v-model="form.seller_id" auto-complete="off" placeholder="" style="width:75%;"></el-input>
+                            <el-form-item label="分类名称：" prop="category_name">
+                                <el-input v-model.trim="form.category_name" auto-complete="off" placeholder="分类名称：" style="width:75%;"></el-input>
+                            </el-form-item>
+                        </el-col>
+                        <el-col :span="10" :offset="2">
+                            <el-form-item label="所属分类" prop="parent_category_id">
+                                <el-select v-model="form.parent_category_id" clearable placeholder="请选择" style="width:75%;">
+                                    <el-option label="一级分类" value="0"></el-option>
+                                    <el-option v-for="item in parentOptions" :key="item.category_id" :label="item.category_name" :value="item.category_id"></el-option>
+                                </el-select>
                             </el-form-item>
                         </el-col>
                     </el-row>
                     <el-row type="flex">
                         <el-col :span="10" :offset="2">
-                            <el-form-item label="产品名称" prop="goods_name">
-                                <el-input v-model="form.goods_name" auto-complete="off" placeholder="" style="width:75%;"></el-input>
+                            <el-form-item label="商家 ID ：" prop="seller_id">
+                                <el-input v-model.trim="form.seller_id" auto-complete="off" placeholder="商家id：" style="width:75%;"></el-input>
                             </el-form-item>
                         </el-col>
                         <el-col :span="10">
-                            <el-form-item label="产品简介" prop="goods_summary">
-                                <el-input v-model="form.goods_summary" auto-complete="off" placeholder="" style="width:75%;"></el-input>
-                            </el-form-item>
-                        </el-col>
-                    </el-row>
-                    <el-row type="flex">
-                        <el-col :span="10" :offset="2">
-                            <el-form-item label="售价" prop="sell_price">
-                                <el-input v-model="form.sell_price" auto-complete="off" placeholder="20字以内" style="width:75%;"></el-input>
-                            </el-form-item>
-                        </el-col>
-                        <el-col :span="10">
-                            <el-form-item label="排序" prop="sort">
-                                <el-input v-model="form.sort" auto-complete="off" placeholder="数字" style="width:75%;"></el-input>
-                            </el-form-item>
-                        </el-col>
-                    </el-row>
-                    <el-row type="flex">
-                        <el-col :span="10" :offset="2">
-                            <el-form-item label="产品状态" prop="status">
+                            <el-form-item label="分类状态：" prop="status">
                                 <el-select v-model="form.status" clearable placeholder="请选择" style="width:75%;">
                                     <el-option label="上架" value="1"></el-option>
                                     <el-option label="下架" value="0"></el-option>
                                 </el-select>
                             </el-form-item>
                         </el-col>
-                        <el-col :span="5">
-                            <el-form-item label="是否热门" prop="is_hot">
-                                <el-select v-model="form.is_hot" clearable placeholder="请选择" style="width:75%;">
-                                    <el-option label="是" value="1"></el-option>
-                                    <el-option label="否" value="0"></el-option>
-                                </el-select>
-                            </el-form-item>
-                        </el-col>
                     </el-row>
                     <el-row type="flex">
                         <el-col :span="10" :offset="2">
-                            <el-form-item label="产品标签" prop="goods_tag">
-                                <el-select v-model="form.goods_tag" clearable placeholder="请选择" style="width:75%;">
-                                    <el-option v-for="item in goodsTagOptions" :key="item.id" :label="item.name" :value="item.id"></el-option>
-                                </el-select>
-                            </el-form-item>
-                        </el-col>
-                    </el-row>
-                    <el-row type="flex">
-                        <el-col :span="10" :offset="2">
-                            <el-form-item label="分享标题" prop="share_title">
-                                <el-input type="text" v-model="form.share_title" placeholder="50字以内" auto-complete="off" style="width:90%;"></el-input>
-                            </el-form-item>
-                        </el-col>
-                        <el-col :span="10">
-                            <el-form-item label="分享描述" prop="share_content">
-                                <el-input type="textarea" v-model="form.share_content" placeholder="50字以内" auto-complete="off" style="width:90%;"></el-input>
+                            <el-form-item label="排　　序：" prop="sort">
+                                <el-input v-model.trim="form.sort" auto-complete="off" placeholder="排序：" style="width:75%;"></el-input>
                             </el-form-item>
                         </el-col>
                     </el-row>
                     <el-row type="flex">
                         <el-col :span="6" :offset="2">
-                            <el-form-item label="产品图" prop="goods_img">
+                            <el-form-item label="分类图片" prop="category_img">
                                 <el-upload class="avatar-uploader" :action="imgurl" accept="image/jpeg,image/gif,image/png"
-                                           :show-file-list="false" :on-success="goodsImgSuccess" :before-upload="beforeAvatarUpload">
-                                    <img v-if="form.goods_img" :src="form.goods_img" class="avatar">
+                                           :show-file-list="false" :on-success="categoryImgSuccess" :before-upload="beforeAvatarUpload">
+                                    <img v-if="form.category_img" :src="form.category_img" class="avatar">
                                     <i v-else class="el-icon-plus avatar-uploader-icon"></i>
                                 </el-upload>
                             </el-form-item>
-                        </el-col>
-                    </el-row>
-                    <el-row type="flex">
-                        <el-col :span="20" :offset="2">
-                            <el-form-item label="产品详情" prop="goods_desc">
-                            </el-form-item>
-                            <editor ref="addeditor" :editorshow.sync="show" @editorgoodsdesc="editorgoodsdesc"></editor>
                         </el-col>
                     </el-row>
                 </el-form>
@@ -103,8 +63,7 @@
 </template>
 
 <script>
-    import editor from './editor.vue';
-    import { addgoods,getcategorylist,getGoodsTag } from "@/api/goods.js";
+    import { addcategory,getParentCategoryList } from "@/api/goodsCategory.js";
     export default{
         data() {
             const words_20 = (rule, value, callback) => {
@@ -118,17 +77,6 @@
                     }
                 }
             };
-            const words_50 = (rule, value, callback) => {
-                if (value == '') {
-                    callback(new Error("不能为空！"));
-                } else {
-                    if (value.length > 50) {
-                        callback(new Error("字数过多！"));
-                    } else {
-                        callback();
-                    }
-                }
-            };
             const selectempty = (rule,value,callback) => {
                 if(value == ''){
                     callback(new Error("不能为空！"));
@@ -136,18 +84,14 @@
                     callback();
                 }
             };
-            const validationprise = (rule,value,callback) => {
+            const number = (rule,value,callback) => {
                 if(value == ''){
                     callback(new Error("不能为空！"));
                 } else {
                     if(!Number.isInteger(Number(value))){
-                        callback(new Error("请输入数字值！"));
-                    } else {
-                        if(value < 0){
-                            callback(new Error("钱数不能小于0！"));
-                        }else{
-                            callback();
-                        }
+                        callback(new Error("格式不正确"));
+                    }else{
+                        callback();
                     }
                 }
             };
@@ -158,71 +102,33 @@
                     callback();
                 }
             };
-            const editorempty = (rule,value,callback) => {
-                console.log(value)
-                if(value == ''){
-                    callback(new Error("产品详情不能为空！"));
-                } else {
-                    callback();
-                }
-            };
-            const secondcategory = (rule,value,callback) => {
-                if(value == ''){
-                    this.form.second_category_id = '-1'
-                    callback();
-                } else {
-                    callback();
-                }
-            };
             return {
                 dialogFormVisible :this.show,
                 imgurl:process.env.BASE_API + '/manage/uploadImg',
                 baseurl:process.env.IMG_API,
-                firstOptions: [
-
-                ],
-                secondOptions: [
-
-                ],
-                goodsTagOptions: [
+                parentOptions: [
 
                 ],
                 form: {
-                    first_category_id:'',
-                    second_category_id:'',
+                    category_name:'',
+                    parent_category_id:'',
                     seller_id:'',
-                    goods_name:'',
-                    goods_summary:'',
-                    sell_price:'',
-                    sort:'50',
+                    category_img:'',
                     status:'',
-                    is_hot:'',
-                    goods_tag:'',
-                    share_title:'',
-                    share_content:'',
-                    goods_img:'',
-                    goods_desc:''
+                    sort:'50',
                 },
                 rules: {
-                    first_category_id: [{required: true, trigger: "change", validator: selectempty}],
-                    second_category_id: [{required: true, trigger: "change", validator: secondcategory}],
-                    seller_id: [{required: true, trigger: "blur"}],
-                    goods_name: [{required: true, trigger: "blur", validator: words_20}],
-                    goods_summary: [{required: true, trigger: "blur"}],
-                    sell_price: [{required: true, trigger: "blur", validator: validationprise}],
-                    sort: [{required: true, trigger: "blur"}],
-                    status: [{required: true, trigger: "change", validator: selectempty}],
-                    is_hot: [{required: true, trigger: "change"}],
-                    goods_tag: [{required: false, trigger: "change"}],
-                    share_title: [{required: true, trigger: "blur", validator: words_20}],
-                    share_content: [{required: true, trigger: "blur", validator: words_50}],
-                    goods_img: [{required: true, trigger: "blur", validator: imgempty}],
-                    goods_desc: [{required: false, trigger: "blur", validator: editorempty}]
+                    category_name: [{required: true, trigger: "blur", validator: words_20}],
+                    parent_category_id: [{required: true, trigger: "change", validator: selectempty}],
+                    seller_id: [{required: true, trigger: "blur", validator: number}],
+                    category_img: [{required: true, trigger: "change", validator: imgempty}],
+                    status: [{required: true, trigger: "change"}],
+                    sort: [{required: false, trigger: "blur", validator: number}]
                 },
             }
         },
         components:{
-            editor
+//            editor
         },
         props: {
             show: {
@@ -236,8 +142,7 @@
             },
         },
         created(){
-            this.firstCategory();
-            this.goodsTag();
+            this.parentCategory();
         },
         mounted() {
 
@@ -249,7 +154,7 @@
                 this.$refs.addForm.validate(valid => {
                     console.log(valid)
                     if(valid){
-                        addgoods(this.form.first_category_id,this.form.second_category_id,this.form.seller_id,this.form.goods_name,this.form.goods_summary,this.form.sell_price,this.form.sort,this.form.status,this.form.is_hot,this.form.goods_tag,this.form.share_title,this.form.share_content,this.form.goods_img,this.form.goods_desc).then(res => {
+                        addcategory(this.form.category_name,this.form.parent_category_id,this.form.seller_id,this.form.category_img,this.form.status,this.form.sort).then(res => {
                             console.log(res)
                             if(res.data.status == '200'){
                                 this.$message({
@@ -294,22 +199,13 @@
                 })
                 done;
             },
-            //是否显示排序
-            isShowSort() {
-                if(this.form.is_hot == '1'){
-                    return true;
-                }else{
-                    this.form.hot_sort = '50';
-                    return false;
-                }
-            },
             //图片上传
-            goodsImgSuccess(res,file,fileList) {
+            categoryImgSuccess(res,file,fileList) {
                 //this.form.list_img = URL.createObjectURL(file.raw);
                 console.log(res)
-                this.form.goods_img = this.baseurl + res.data;
+                this.form.category_img = this.baseurl + res.data;
                 //this.form.list_img_show = this.baseurl + res.data;
-                console.log(this.form.goods_img)
+                console.log(this.form.category_img)
             },
             beforeAvatarUpload(file) {
                 const isJPG = file.type === 'image/jpeg';
@@ -325,36 +221,13 @@
                 return (isJPG || isGIF || isPNG) && isLt2M;
             },
             //渲染菜单
-            firstCategory(){
-                getcategorylist(0).then(res => {
+            parentCategory(){
+                getParentCategoryList(0,152483126733365).then(res => {
                     console.log(res.data.data.data);
-                    this.firstOptions = res.data.data.data;
+                    this.parentOptions = res.data.data.data;
                 }).catch(err => {
                     console.log(error)
                 })
-            },
-            secondCategory(parent_id){
-                console.log(parent_id)
-                getcategorylist(parent_id).then(res => {
-                    console.log(res.data.data.data)
-                    this.secondOptions = res.data.data.data;
-                }).catch(err => {
-                    console.log(error)
-                })
-            },
-            goodsTag(){
-                console.log(999999)
-                getGoodsTag().then(res => {
-                    console.log(res.data.data)
-                    this.goodsTagOptions = res.data.data;
-                }).catch(err => {
-                    console.log(error)
-                })
-            },
-            //传editor值
-            editorgoodsdesc(editorcontent) {
-                this.form.goods_desc = editorcontent;
-                console.log(this.form.goods_desc)
             }
         },
     }
@@ -396,7 +269,7 @@
 
 </style>
 <style scoped>
-    #addproduct {
+    #addgoodscategory {
         overflow: hidden;
         position: relative;
     }

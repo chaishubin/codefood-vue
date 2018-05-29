@@ -1,11 +1,11 @@
 import fetch from '@/utils/fetch'
 //获取列表信息
-export function getlist(page,length,category_name,parent_category_name,seller_name,shop_name,status) {
+export function getlist(page_num,length,category_name,parent_category_name,seller_name,shop_name,status) {
     return fetch({
         url: '/manage/goodsCategoryList',
         method: 'post',
         data: {
-            page,
+            page_num,
             length,
             category_name,
             parent_category_name,
@@ -26,43 +26,29 @@ export function modify(goods_id,status) {
         }
     })
 }
-//获取产品分类一二级菜单
-export function getcategorylist(parent_id) {
+//获取一级产品分类
+export function getParentCategoryList(parent_id,seller_id) {
     return fetch({
-        url: '/overseas/getGoodsCategory',
+        url: '/manage/goodsCategoryList',
         method: 'post',
         data: {
-            parent_id
+            parent_id,
+            seller_id
         }
     })
 }
-//添加产品
-export function addproduct(first_category_id,second_category_id,goods_name,goods_summary,hospital_name,hospital_summary,hospital_city,sell_price,front_money,specialty,status,share_title,share_content,sort,is_hot,hot_sort,goods_tag,list_img,main_img,hot_img,goods_desc) {
+//添加产品分类
+export function addcategory(category_name,parent_id,seller_id,category_img,status,sort) {
     return fetch({
-        url: '/overseas/goodsModify',
+        url: '/manage/goodsCategoryModify',
         method: 'post',
         data: {
-            first_category_id,
-            second_category_id,
-            goods_name,
-            goods_summary,
-            hospital_name,
-            hospital_summary,
-            hospital_city,
-            sell_price,
-            front_money,
-            specialty,
+            category_name,
+            parent_id,
+            seller_id,
+            category_img,
             status,
-            share_title,
-            share_content,
-            sort,
-            is_hot,
-            hot_sort,
-            goods_tag,
-            list_img,
-            main_img,
-            hot_img,
-            goods_desc
+            sort
         }
     })
 }

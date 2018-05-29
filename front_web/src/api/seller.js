@@ -1,11 +1,11 @@
 import fetch from '@/utils/fetch'
 //获取列表信息
-export function getlist(offset,length,user_mobile,username,shop_name,status) {
+export function getlist(page_num,length,user_mobile,username,shop_name,status) {
     return fetch({
         url: '/home/sellerList',
         method: 'post',
         data: {
-            offset,
+            page_num,
             length,
             user_mobile,
             username,
@@ -25,8 +25,7 @@ export function modify(goods_id,status) {
         }
     })
 }
-
-//添加产品
+//添加商家
 export function addseller(user_mobile,username,password,password_confirmation,address,shop_name,shop_logo,status) {
     return fetch({
         url: '/home/sellerRegister',
