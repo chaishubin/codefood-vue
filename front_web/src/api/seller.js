@@ -14,13 +14,13 @@ export function getlist(page_num,length,user_mobile,username,shop_name,status) {
         }
     })
 }
-//修改产品状态
-export function modify(goods_id,status) {
+//修改商户状态
+export function modify(id,status) {
     return fetch({
-        url: '/overseas/goodsStatus',
+        url: '/home/sellerModify',
         method: 'post',
         data: {
-            goods_id,
+            id,
             status
         }
     })
@@ -42,54 +42,41 @@ export function addseller(user_mobile,username,password,password_confirmation,ad
         }
     })
 }
-//编辑产品
-export function editproduct(goods_id,first_category_id,second_category_id,goods_name,goods_summary,hospital_name,hospital_summary,hospital_city,sell_price,front_money,specialty,status,share_title,share_content,sort,is_hot,hot_sort,goods_tag,list_img,main_img,hot_img,goods_desc) {
+//编辑商户
+export function editseller(id,user_mobile,username,password,password_confirmation,address,shop_name,shop_logo,status) {
     return fetch({
-        url: '/overseas/goodsModify',
+        url: '/home/sellerModify',
         method: 'post',
         data: {
-            goods_id,
-            first_category_id,
-            second_category_id,
-            goods_name,
-            goods_summary,
-            hospital_name,
-            hospital_summary,
-            hospital_city,
-            sell_price,
-            front_money,
-            specialty,
-            status,
-            share_title,
-            share_content,
-            sort,
-            is_hot,
-            hot_sort,
-            goods_tag,
-            list_img,
-            main_img,
-            hot_img,
-            goods_desc
+            id,
+            user_mobile,
+            username,
+            password,
+            password_confirmation,
+            address,
+            shop_name,
+            shop_logo,
+            status
         }
     })
 }
-//获取产品信息
-export function getgoodsinfo(goods_id) {
+//获取商家信息
+export function getsellerinfo(id) {
     return fetch({
-        url: '/overseas/goodsDetail',
+        url: '/home/sellerDetail',
         method: 'post',
         data: {
-            goods_id
+            id
         }
     })
 }
-//删除产品
-export function goodsdelete(goods_id) {
+//删除商家
+export function sellerdelete(id) {
     return fetch({
-        url: '/overseas/goodsDelete',
+        url: '/home/sellerDelete',
         method: 'post',
         data: {
-            goods_id
+            id
         }
     })
 }

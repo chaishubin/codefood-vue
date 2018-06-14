@@ -185,6 +185,26 @@ class GoodsController extends Controller
     /**
      * @param Request $request
      * @return \Illuminate\Http\JsonResponse
+     * 商品分类详情
+     */
+    public function goodsCategoryDetail(Request $request)
+    {
+        $info = $request->all();
+        Validator::make($info, [
+            'category_id'   => 'required|numeric',
+        ])->validate();
+
+        $category = GoodsCategory::find($info['category_id']);
+        if (!$category){
+            return Common::jsonFormat('500','不存在此分类');
+        }
+
+        return Common::jsonFormat('200','获取成功',$category);
+    }
+
+    /**
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
      * 商品分类删除
      */
     public function goodsCategoryDelete(Request $request)
@@ -197,6 +217,10 @@ class GoodsController extends Controller
         $category = GoodsCategory::find($info['category_id']);
         if (!$category){
             return Common::jsonFormat('500','不存在此分类');
+        }
+        $goods = Goods::where('category_id',$info['category_id'])->get();
+        if ($goods){
+            return Common::jsonFormat('500','此分类下面仍有商品，不允许删除');
         }
 
         $res = GoodsCategory::where('category_id',$info['category_id'])->delete();
@@ -288,21 +312,45 @@ class GoodsController extends Controller
             $goods_query->where('status',$info['status']);
         }
 
+        $goods_count = $goods_query->get();
+
+        if ($goods_count) {
+            foreach ($goods_count as $k => $v) {
+                $category = GoodsCategory::find($v['category_id']);
+                if ($category) {
+                    if ($category['status'] == 0) {
+                        unset($goods_count[$k]);
+                        continue;
+                    }
+                    if ($category['parent_id'] != 0) {
+                        $parent = GoodsCategory::find($category['parent_id']);
+                        if ($parent['status'] == 0) {
+                            unset($goods_count[$k]);
+                            continue;
+                        }
+                    }
+                }
+            }
+        }
+
+        $total = $goods_count->count();
 
         $goods = $goods_query->offset($offset)->limit($limit)->orderBy('sort','asc')->get();
 
         if ($goods){
-            foreach ($goods as $v){
-                $v['goods_tag'] = Common::goodsTag($v['goods_tag']);
-                $v['is_hot'] = $v['is_hot'] ? '热门' : '非热门';
-                $seller = Seller::find($v['seller_id']);
-                $v['seller_name'] = $seller ? $seller['username'] : $v['seller_id'];
-                $v['shop_name'] = $seller ? $seller['shop_name'] : '';
-
+            foreach ($goods as $k => $v){
                 $category = GoodsCategory::find($v['category_id']);
                 if ($category){
+                    if ($category['status'] == 0){
+                        unset($goods[$k]);
+                        continue;
+                    }
                     if ($category['parent_id'] != 0){
                         $parent = GoodsCategory::find($category['parent_id']);
+                        if ($parent['status'] == 0){
+                            unset($goods[$k]);
+                            continue;
+                        }
                         $parent_name = '';
                         if ($parent){
                             $parent_name = $parent['category_name'];
@@ -313,10 +361,14 @@ class GoodsController extends Controller
                     }
                 }
 
+                $v['goods_tag'] = Common::goodsTag($v['goods_tag']);
+                $v['is_hot'] = $v['is_hot'] ? '热门' : '非热门';
+                $seller = Seller::find($v['seller_id']);
+                $v['seller_name'] = $seller ? $seller['username'] : $v['seller_id'];
+                $v['shop_name'] = $seller ? $seller['shop_name'] : '';
             }
         }
 
-        $total = $goods_query->count();
         $data = ['total' => $total,$goods];
 
         return Common::jsonFormat('200','获取成功',$data);

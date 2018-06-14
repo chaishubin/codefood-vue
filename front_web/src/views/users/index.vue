@@ -66,7 +66,7 @@
                 </el-table-column>
                 <el-table-column label="操作" width="250">
                     <template slot-scope="scope">
-                        <el-button v-if="scope.row.status === 0" size="small" @click="changeStatus(scope.row.d,1)">启用</el-button>
+                        <el-button v-if="scope.row.status === 0" size="small" @click="changeStatus(scope.row.id,1)">启用</el-button>
                         <el-button v-else-if="scope.row.status === 1" size="small" @click="changeStatus(scope.row.id,0)">禁用</el-button>
                         <el-button size="small" @click="editpt(scope.row.id)">编辑</el-button>
                         <el-button size="small" type="danger" @click="deleteuser(scope.row.id)">删除</el-button>
@@ -88,8 +88,8 @@
 
 <script>
     import adduser from './components/addUser';
-//    import editproduct from './components/editProduct';
-    import { getlist } from "@/api/user.js";
+    import edituser from './components/editUser';
+    import { getlist,userdelete,modify } from "@/api/user.js";
     export default {
         data() {
             return {
@@ -120,7 +120,7 @@
         },
         components: {
             adduser,
-//            editproduct,
+            edituser,
         },
         mounted() {
 
@@ -187,7 +187,7 @@
             },
             deleteuser(id) {
                 const _this = this;
-                sellerdelete(id).then(res => {
+                userdelete(id).then(res => {
                     console.log(res)
                     if(res.data.status == '200'){
                         this.$message({

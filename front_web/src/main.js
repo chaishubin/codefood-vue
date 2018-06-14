@@ -1,30 +1,33 @@
 
 import Vue from 'vue'
 
-import 'normalize.css/normalize.css'// A modern alternative to CSS resets
+// import 'normalize.css/normalize.css'// A modern alternative to CSS resets
 
-import ElementUI from 'element-ui'
-import 'element-ui/lib/theme-chalk/index.css'
-import locale from 'element-ui/lib/locale/lang/zh-CN'
+// import ElementUI from 'element-ui'
+// import 'element-ui/lib/theme-chalk/index.css'
+// import locale from 'element-ui/lib/locale/lang/zh-CN'
 
-import '@/styles/index.scss' // global css
+// import '@/styles/index.scss' // global css
 
-import App from './App'
-import router from './router'
-// import store from './store'
+// import App from './App'
+// import router from './router'
+// // import store from './store'
 
-import '@/icons' // icon
-//import '@/permission' // permission control
+// import '@/icons' // icon
+// //import '@/permission' // permission control
 
-import './../static/UE/ueditor.config.js';
-import './../static/UE/ueditor.all.min.js';
-import './../static/UE/lang/zh-cn/zh-cn.js';
-import './../static/UE/ueditor.parse.min.js';
+// import './../static/UE/ueditor.config.js';
+// import './../static/UE/ueditor.all.min.js';
+// import './../static/UE/lang/zh-cn/zh-cn.js';
+// import './../static/UE/ueditor.parse.min.js';
 
 
-Vue.use(ElementUI, { locale })
+// Vue.use(ElementUI, { locale })
 
-Vue.config.productionTip = false
+// Vue.config.productionTip = false
+
+
+
 
 // Vue.prototype.$_has = function (feature) {
 //   let resources = [];
@@ -53,11 +56,18 @@ Vue.config.productionTip = false
 //   }
 // });
 
+import test from './views/test';
 new Vue({
-  el: '#app',
-  router,
-  template: '<App/>',
-  components: { App }
+	el: '#app',
+	template:'<test/>',
+	components:{ test }
 })
+
+// new Vue({
+//   el: '#app',
+//   router,
+//   template: '<App/>',
+//   components: { App }
+// })
 
 // 跳转首页  http://front.test/

@@ -107,13 +107,13 @@ export function getgoodsinfo(goods_id) {
         }
     })
 }
-//删除产品
-export function goodsdelete(goods_id) {
+//删除订单
+export function orderdelete(id) {
     return fetch({
-        url: '/overseas/goodsDelete',
+        url: '/home/orderDelete',
         method: 'post',
         data: {
-            goods_id
+            id
         }
     })
 }

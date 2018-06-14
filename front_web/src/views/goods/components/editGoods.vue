@@ -3,7 +3,7 @@
         <div class="formwarp">
             <el-dialog width="80%" top="5vh" :before-close="BcloseDialog" title="编辑产品" :visible.sync="dialogFormVisible" :close-on-click-modal="false"
                        :lock-scroll="true">
-                <el-form :model="form" :rules="rules" ref="addForm">
+                <el-form :model="form" :rules="rules" ref="editForm">
                     <el-row type="flex">
                         <el-col :span="10" :offset="2">
                             <el-form-item label="产品分类" prop="first_category_id">
@@ -105,12 +105,13 @@
                         <el-col :span="20" :offset="2">
                             <el-form-item label="产品详情" prop="goods_desc">
                             </el-form-item>
-                            <editor ref="addeditor" :editorshow.sync="show" @editorgoodsdesc="editorgoodsdesc"></editor>
+
+                            <editor ref="editeditor" :editorshow.sync="show" @editorgoodsdesc="editorgoodsdesc"></editor>
                         </el-col>
                     </el-row>
                 </el-form>
                 <div slot="footer" class="dialog-footer">
-                    <el-button @click="closechild('addForm')">取 消</el-button>
+                    <el-button @click="closechild('editForm')">取 消</el-button>
                     <el-button type="primary" @click.native.prevent="submitform">保 存</el-button>
                 </div>
             </el-dialog>
@@ -238,7 +239,7 @@
             }
         },
         components:{
-            editor
+            editor,
         },
         props: [
 //            show: {
@@ -269,12 +270,25 @@
         methods: {
             //获取商品信息
             getInfo() {
-               console.log(this.goods_id)
                 const _this = this;
                 getgoodsinfo(this.goods_id).then(res => {
-                    console.log(res.data.data;)
+//                    console.log(res.data.data)
                     var result = res.data.data;
-                    _this.form.first_category_id = 
+                    _this.form.first_category_id = result.first_category_id;
+                    _this.form.second_category_id = result.second_category_id;
+                    _this.form.seller_id = result.seller_id;
+                    _this.form.goods_name = result.goods_name;
+                    _this.form.goods_summary = result.goods_summary;
+                    _this.form.sell_price = result.sell_price;
+                    _this.form.sort = result.sort;
+                    _this.form.status = result.status;
+                    _this.form.is_hot = result.is_hot;
+                    _this.form.goods_tag = result.goods_tag;
+                    _this.form.share_title = result.share_title;
+                    _this.form.share_content = result.share_content;
+                    _this.form.goods_img = result.goods_img;
+                    _this.form.goods_desc = result.goods_desc;
+
 
                 }).catch(err => {
                     console.log(error)
@@ -283,10 +297,10 @@
             //表单提交
             submitform() {
                 const _this = this;
-                this.$refs.addForm.validate(valid => {
-                    console.log(valid)
+                this.$refs.editForm.validate(valid => {
+//                    console.log(valid)
                     if(valid){
-                        addgoods(this.form.first_category_id,this.form.second_category_id,this.form.seller_id,this.form.goods_name,this.form.goods_summary,this.form.sell_price,this.form.sort,this.form.status,this.form.is_hot,this.form.goods_tag,this.form.share_title,this.form.share_content,this.form.goods_img,this.form.goods_desc).then(res => {
+                        editgoods(_this.goods_id,this.form.first_category_id,this.form.second_category_id,this.form.seller_id,this.form.goods_name,this.form.goods_summary,this.form.sell_price,this.form.sort,this.form.status,this.form.is_hot,this.form.goods_tag,this.form.share_title,this.form.share_content,this.form.goods_img,this.form.goods_desc).then(res => {
                             console.log(res)
                             if(res.data.status == '200'){
                                 this.$message({
@@ -325,8 +339,7 @@
             //dialog关闭前执行
             BcloseDialog(done){
                 this.$nextTick(function() {
-                    this.$refs['addForm'].resetFields();
-                    //this.$refs.addeditor.destoryeditor();
+                    this.$refs['editForm'].resetFields();
                     this.$emit('closedialog',false);
                 })
                 done;
@@ -355,14 +368,14 @@
             //渲染菜单
             firstCategory(){
                 getcategorylist(0).then(res => {
-                    console.log(res.data.data.data);
+//                    console.log(res.data.data.data);
                     this.firstOptions = res.data.data.data;
                 }).catch(err => {
                     console.log(error)
                 })
             },
             secondCategory(parent_id){
-                console.log(parent_id)
+//                console.log(parent_id)
                 getcategorylist(parent_id).then(res => {
                     console.log(res.data.data.data)
                     this.secondOptions = res.data.data.data;
@@ -372,7 +385,7 @@
             },
             goodsTag(){
                 getGoodsTag().then(res => {
-                    console.log(res.data.data)
+//                    console.log(res.data.data)
                     this.goodsTagOptions = res.data.data;
                 }).catch(err => {
                     console.log(error)

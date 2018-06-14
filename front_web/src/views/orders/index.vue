@@ -91,7 +91,7 @@
 <script>
 //    import addproduct from './components/addProduct';
 //    import editproduct from './components/editProduct';
-    import { getlist } from "@/api/order.js";
+    import { getlist,orderdelete } from "@/api/order.js";
     export default {
         data() {
             return {
@@ -183,7 +183,7 @@
             },
             deleteorder(id) {
                 const _this = this;
-                sellerdelete(id).then(res => {
+                orderdelete(id).then(res => {
                     console.log(res)
                     if(res.data.status == '200'){
                         this.$message({

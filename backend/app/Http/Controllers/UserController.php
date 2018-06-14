@@ -159,10 +159,11 @@ class UserController extends Controller
             'id' => 'required|numeric',
             'name' => 'nullable',
             'tel' => 'nullable|numeric',
-            'password' => 'nullable',
-            'password_confirmation' => 'required_with:password|confirmed',
+            'password' => 'nullable|confirmed',
+            'password_confirmation' => 'required_with:password',
             'email' => 'nullable',
             'icon' => 'nullable',
+            'status' => 'nullable',
         ])->validate();
 
         //判断用户是否存在
@@ -186,6 +187,9 @@ class UserController extends Controller
         if (isset($info['icon']) && $info['icon']){
             $where['icon'] = $info['icon'];
         }
+        if (isset($info['status']) && !is_null($info['status'])){
+            $where['status'] = $info['status'];
+        }
 
         if (!empty($where)){
             $res = User::where('id',$info['id'])->update($where);
@@ -196,6 +200,51 @@ class UserController extends Controller
             }
         }
         return Common::jsonFormat('200','修改成功');
+    }
+
+    /**
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     * 用户详情
+     */
+    public function userDetail(Request $request)
+    {
+        $info = $request->all();
+        Validator::make($info, [
+            'id'   => 'required|numeric',
+        ])->validate();
+
+        $user = User::find($info['id']);
+        if (!$user){
+            return Common::jsonFormat('500','不存在此用户');
+        }
+        $user['password'] = '';
+
+        return Common::jsonFormat('200','获取成功',$user);
+    }
+
+    /**
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     * 用户删除
+     */
+    public function userDelete(Request $request)
+    {
+        $info = $request->all();
+        Validator::make($info, [
+            'id'   => 'required|numeric',
+        ])->validate();
+
+        $user = User::find($info['id']);
+        if (!$user){
+            return Common::jsonFormat('500','不存在此用户');
+        }
+        $res = User::where('id',$info['id'])->delete();
+        if ($res){
+            return Common::jsonFormat('200','删除成功');
+        }else{
+            return Common::jsonFormat('500','删除失败');
+        }
     }
 
     /**

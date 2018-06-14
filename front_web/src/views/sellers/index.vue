@@ -62,7 +62,7 @@
                 </el-table-column>
                 <el-table-column label="操作" width="250">
                     <template slot-scope="scope">
-                        <el-button v-if="scope.row.status === 0" size="small" @click="changeStatus(scope.row.d,1)">启用</el-button>
+                        <el-button v-if="scope.row.status === 0" size="small" @click="changeStatus(scope.row.id,1)">启用</el-button>
                         <el-button v-else-if="scope.row.status === 1" size="small" @click="changeStatus(scope.row.id,0)">禁用</el-button>
                         <el-button size="small" @click="editpt(scope.row.id)">编辑</el-button>
                         <el-button size="small" type="danger" @click="deleteseller(scope.row.id)">删除</el-button>
@@ -84,8 +84,8 @@
 
 <script>
     import addseller from './components/addSeller';
-//    import editproduct from './components/editProduct';
-    import { getlist } from "@/api/seller.js";
+    import editseller from './components/editSeller';
+    import { getlist,sellerdelete,modify } from "@/api/seller.js";
     export default {
         data() {
             return {
@@ -117,7 +117,7 @@
         },
         components: {
             addseller,
-//            editproduct,
+            editseller,
         },
         mounted() {
 

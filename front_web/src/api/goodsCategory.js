@@ -16,12 +16,12 @@ export function getlist(page_num,length,category_name,parent_category_name,selle
     })
 }
 //修改产品状态
-export function modify(goods_id,status) {
+export function modify(category_id,status) {
     return fetch({
-        url: '/overseas/goodsStatus',
+        url: '/manage/goodsCategoryModify',
         method: 'post',
         data: {
-            goods_id,
+            category_id,
             status
         }
     })
@@ -53,53 +53,38 @@ export function addcategory(category_name,parent_id,seller_id,category_img,statu
     })
 }
 //编辑产品
-export function editproduct(goods_id,first_category_id,second_category_id,goods_name,goods_summary,hospital_name,hospital_summary,hospital_city,sell_price,front_money,specialty,status,share_title,share_content,sort,is_hot,hot_sort,goods_tag,list_img,main_img,hot_img,goods_desc) {
+export function editcategory(category_id,category_name,parent_id,seller_id,category_img,status,sort) {
     return fetch({
-        url: '/overseas/goodsModify',
+        url: '/manage/goodsCategoryModify',
         method: 'post',
         data: {
-            goods_id,
-            first_category_id,
-            second_category_id,
-            goods_name,
-            goods_summary,
-            hospital_name,
-            hospital_summary,
-            hospital_city,
-            sell_price,
-            front_money,
-            specialty,
+            category_id,
+            category_name,
+            parent_id,
+            seller_id,
+            category_img,
             status,
-            share_title,
-            share_content,
-            sort,
-            is_hot,
-            hot_sort,
-            goods_tag,
-            list_img,
-            main_img,
-            hot_img,
-            goods_desc
+            sort
         }
     })
 }
-//获取产品信息
-export function getgoodsinfo(goods_id) {
+//获取产品分类信息
+export function getcategoryinfo(category_id) {
     return fetch({
-        url: '/overseas/goodsDetail',
+        url: '/manage/goodsCategoryDetail',
         method: 'post',
         data: {
-            goods_id
+            category_id
         }
     })
 }
-//删除产品
-export function goodsdelete(goods_id) {
+//删除产品分类
+export function categorydelete(category_id) {
     return fetch({
-        url: '/overseas/goodsDelete',
+        url: '/manage/goodsCategoryDelete',
         method: 'post',
         data: {
-            goods_id
+            category_id
         }
     })
 }

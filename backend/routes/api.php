@@ -70,9 +70,12 @@ Route::group(['prefix' => 'home'], function(){
     Route::post('orderList', 'OrderController@orderList')->name('order.orderList');
     Route::post('orderAdd', 'OrderController@orderAdd')->name('order.orderAdd');
     Route::post('orderModify', 'OrderController@orderModify')->name('order.orderModify');
+    Route::post('orderDelete', 'OrderController@orderDelete')->name('order.orderDelete');
     Route::post('userRegister', 'UserController@userRegister')->name('user.userRegister');
     Route::post('userLogin', 'UserController@userLogin')->name('user.userLogin');
     Route::post('userModify', 'UserController@userModify')->name('user.userModify');
+    Route::post('userDetail', 'UserController@userDetail')->name('user.userDetail');
+    Route::post('userDelete', 'UserController@userDelete')->name('user.userDelete');
     Route::post('userCollectionList', 'UserController@userCollectionList')->name('user.userCollectionList');
     Route::post('userCollectionModify', 'UserController@userCollectionModify')->name('user.userCollectionModify');
     Route::any('serve', 'OrderController@serve')->name('order.serve');
@@ -82,6 +85,8 @@ Route::group(['prefix' => 'home'], function(){
     Route::post('sellerRegister', 'SellerController@sellerRegister')->name('user.sellerRegister');
     Route::post('sellerLogin', 'SellerController@sellerLogin')->name('user.sellerLogin');
     Route::post('sellerModify', 'SellerController@sellerModify')->name('user.sellerModify');
+    Route::post('sellerDetail', 'SellerController@sellerDetail')->name('user.sellerDetail');
+    Route::post('sellerDelete', 'SellerController@sellerDelete')->name('user.sellerDelete');
 });
 
 //后台接口
@@ -89,6 +94,7 @@ Route::group(['prefix' => 'manage'], function(){
     Route::post('goodsCategoryList', 'GoodsController@goodsCategoryList')->name('goods.goodsCategoryList');
     Route::post('getGoodsCategoryList', 'Common@getGoodsCategoryList')->name('goods.getGoodsCategoryList');
     Route::post('goodsCategoryModify', 'GoodsController@goodsCategoryModify')->name('goods.goodsCategoryModify');
+    Route::post('goodsCategoryDetail', 'GoodsController@goodsCategoryDetail')->name('goods.goodsCategoryDetail');
     Route::post('goodsCategoryDelete', 'GoodsController@goodsCategoryDelete')->name('goods.goodsCategoryDelete');
     Route::post('goodsModify', 'GoodsController@goodsModify')->name('goods.goodsModify');
     Route::post('goodsList', 'GoodsController@goodsList')->name('goods.goodsList');

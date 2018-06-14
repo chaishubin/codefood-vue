@@ -82,7 +82,7 @@
                 </el-table-column>
                 <el-table-column prop="goods_tag" label="产品标签">
                 </el-table-column>
-                <el-table-column prop="status" label="产品状态">
+                <el-table-column prop="status" :formatter="formatStatus" label="产品状态">
                 </el-table-column>
                 <el-table-column prop="is_hot" label="是否热门">
                 </el-table-column>
@@ -98,14 +98,14 @@
                         <el-button v-if="scope.row.status === 0" size="small" @click="changeStatus(scope.row.goods_id,1)">上架</el-button>
                         <el-button v-else-if="scope.row.status === 1" size="small" @click="changeStatus(scope.row.goods_id,0)">下架</el-button>
                         <el-button size="small" @click="editpt(scope.row.goods_id)">编辑</el-button>
-                        <el-button size="small" type="danger" @click="deleteorder(scope.row.goods_id)">删除</el-button>
+                        <el-button size="small" type="danger" @click="deletegoods(scope.row.goods_id)">删除</el-button>
                     </template>
                 </el-table-column>
             </el-table>
             <div class="pagination" style="margin:20px 0;">
                 <el-row type="flex" align="middle" justify="end">
                     <!--<span class="demonstration" style="font-size: 14px;color: #8492a6;">显示总数</span>-->
-                    <el-pagination @current-change="handleCurrentChange" background layout="total,prev, pager, next" :total="total" :page-size="pagesize">
+                    <el-pagination @current-change="handleCurrentChange" :current-page.sync="cur_page" background layout="total,prev, pager, next" :total="total" :page-size="pagesize">
                     </el-pagination>
                 </el-row>
             </div>
@@ -118,7 +118,7 @@
 <script>
     import addgoods from './components/addgoods';
     import editgoods from './components/editgoods';
-    import { getlist,getGoodsTag,getcategorylist } from "@/api/goods.js";
+    import { getlist,getGoodsTag,getcategorylist,goodsdelete,modify } from "@/api/goods.js";
     export default {
         data() {
             return {
@@ -193,6 +193,13 @@
                 this.editshow = false;
                 this.getData();
             },
+            formatStatus(row, column, cellValue){
+                if (cellValue === 1){
+                    return '上架';
+                }else if (cellValue === 0){
+                    return '下架';
+                }
+            },
             changeStatus(id,status){
                 modify(id,status).then(res => {
                     console.log(res.data)
@@ -214,9 +221,9 @@
                     console.log(error)
                 })
             },
-            deleteorder(id) {
+            deletegoods(goods_id) {
                 const _this = this;
-                sellerdelete(id).then(res => {
+                goodsdelete(goods_id).then(res => {
                     console.log(res)
                     if(res.data.status == '200'){
                         this.$message({
@@ -245,7 +252,7 @@
                 })
             },
             secondCategory(parent_id){
-                console.log(parent_id)
+//                console.log(parent_id)
                 getcategorylist(parent_id).then(res => {
                     console.log(res.data.data.data)
                     this.secondOptions = res.data.data.data;

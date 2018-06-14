@@ -190,6 +190,16 @@ h2{ margin:0; padding:25px 0; }
                     </form>
                 </div>
                 <div class="item-doc">
+                    <h5>商品分类详情: <small class="link">/api/manage/goodsCategoryDetail</small></h5>
+                    <form role="form" action="/api/manage/goodsCategoryDetail">
+                        <input type="hidden" name="_token" value="<?php echo csrf_token(); ?>" />
+                        <div class="input-group">
+                            <span class="input-group-addon">category_id</span><input name="category_id" placeholder="分类id" value="" type="text" class="form-control">
+                        </div>
+                        <button type="submit" class="btn btn-primary">Submit</button>
+                    </form>
+                </div>
+                <div class="item-doc">
                     <h5>商品分类删除: <small class="link">/api/manage/goodsCategoryDelete</small></h5>
                     <form role="form" action="/api/manage/goodsCategoryDelete">
                         <input type="hidden" name="_token" value="<?php echo csrf_token(); ?>" />

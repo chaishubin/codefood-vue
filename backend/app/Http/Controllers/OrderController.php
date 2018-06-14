@@ -154,6 +154,31 @@ class OrderController extends Controller
         }
     }
 
+    /**
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     * 订单删除
+     */
+    public function orderDelete(Request $request)
+    {
+        $info = $request->all();
+        Validator::make($info, [
+            'id'   => 'required|numeric',
+        ])->validate();
+
+        $order = Order::find($info['id']);
+        if (!$order){
+            return Common::jsonFormat('500','不存在此单号');
+        }
+
+        $res = Order::where('id',$info['id'])->delete();
+        if ($res){
+            return Common::jsonFormat('200','删除成功');
+        }else{
+            return Common::jsonFormat('500','删除失败');
+        }
+    }
+
     public function serve()
     {
         $app = Factory::payment(config('wechat.payment'));

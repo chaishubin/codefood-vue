@@ -10,8 +10,8 @@
                                 <el-input v-model.trim="form.category_name" auto-complete="off" placeholder="分类名称：" style="width:75%;"></el-input>
                             </el-form-item>
                         </el-col>
-                        <el-col :span="10" :offset="2">
-                            <el-form-item label="所属分类" prop="parent_category_id">
+                        <el-col :span="10">
+                            <el-form-item label="所属分类：" prop="parent_category_id">
                                 <el-select v-model="form.parent_category_id" clearable placeholder="请选择" style="width:75%;">
                                     <el-option label="一级分类" value="0"></el-option>
                                     <el-option v-for="item in parentOptions" :key="item.category_id" :label="item.category_name" :value="item.category_id"></el-option>

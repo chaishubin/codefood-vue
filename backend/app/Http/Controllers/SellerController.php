@@ -189,4 +189,51 @@ class SellerController extends Controller
             return Common::jsonFormat('500','修改失败');
         }
     }
+
+    /**
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     * 商家详情
+     */
+    public function sellerDetail(Request $request)
+    {
+        $info = $request->all();
+        Validator::make($info, [
+            'id'   => 'required|numeric',
+        ])->validate();
+
+        $seller = Seller::find($info['id']);
+        if (!$seller){
+            return Common::jsonFormat('500','不存在此商户');
+        }
+        $seller['password'] = '';
+
+        return Common::jsonFormat('200','获取成功',$seller);
+    }
+
+    /**
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     * 商家删除
+     */
+    public function sellerDelete(Request $request)
+    {
+        $info = $request->all();
+        Validator::make($info, [
+            'id'   => 'required|numeric',
+        ])->validate();
+
+        $seller = Seller::find($info['id']);
+        if (!$seller){
+            return Common::jsonFormat('500','不存在此商户');
+        }
+        $res = Seller::where('id',$info['id'])->delete();
+        if ($res){
+            return Common::jsonFormat('200','删除成功',$seller);
+        }else{
+            return Common::jsonFormat('200','删除失败',$seller);
+        }
+
+
+    }
 }

@@ -63,16 +63,16 @@
                         <img :src="scope.row.category_img" width="50" height="50"/>
                     </template>
                 </el-table-column>
-                <el-table-column prop="status" label="状态">
+                <el-table-column prop="status" :formatter="formatStatus" label="状态">
                 </el-table-column>
                 <el-table-column prop="sort" label="排序">
                 </el-table-column>
                 <el-table-column label="操作" width="250">
                     <template slot-scope="scope">
-                        <el-button v-if="scope.row.status === 0" size="small" @click="changeStatus(scope.row.d,1)">上架</el-button>
-                        <el-button v-else-if="scope.row.status === 1" size="small" @click="changeStatus(scope.row.id,0)">下架</el-button>
+                        <el-button v-if="scope.row.status === 0" size="small" @click="changeStatus(scope.row.category_id,1)">上架</el-button>
+                        <el-button v-else-if="scope.row.status === 1" size="small" @click="changeStatus(scope.row.category_id,0)">下架</el-button>
                         <el-button size="small" @click="editpt(scope.row.category_id)">编辑</el-button>
-                        <el-button size="small" type="danger" @click="deleteorder(scope.row.category_id)">删除</el-button>
+                        <el-button size="small" type="danger" @click="deletecategory(scope.row.category_id)">删除</el-button>
                     </template>
                 </el-table-column>
             </el-table>
@@ -85,14 +85,14 @@
             </div>
         </div>
         <addcategory v-if="addshow" :show.sync="addshow" @closedialog="addChange"></addcategory>
-        <editcategory v-if="editshow" :show.sync="editshow" :category_id.sync="goods_id" @closedialog="editChange"></editcategory>
+        <editcategory v-if="editshow" :show.sync="editshow" :category_id.sync="category_id" @closedialog="editChange"></editcategory>
     </div>
 </template>
 
 <script>
     import addcategory from './components/addgoodscategory';
-//    import editproduct from './components/editProduct';
-    import { getlist } from "@/api/goodsCategory.js";
+    import editcategory from './components/editGoodsCategory';
+    import { getlist,categorydelete,modify } from "@/api/goodsCategory.js";
     export default {
         data() {
             return {
@@ -109,7 +109,7 @@
                 cur_page: 1,
                 addshow:false,
                 editshow:false,
-                id:'',
+                category_id:'',
             }
         },
         created(){
@@ -117,7 +117,7 @@
         },
         components: {
             addcategory,
-//            editproduct,
+            editcategory,
         },
         mounted() {
 
@@ -126,8 +126,8 @@
             addpt(){
                 this.addshow = true;
             },
-            editpt(id){
-                this.id = id;
+            editpt(category_id){
+                this.category_id = category_id;
                 this.editshow = true;
             },
             handleCurrentChange(val){
@@ -154,8 +154,15 @@
                 this.editshow = false;
                 this.getData();
             },
-            changeStatus(id,status){
-                modify(id,status).then(res => {
+            formatStatus(row, column, cellValue){
+                if (cellValue === 1){
+                    return '上架';
+                }else if (cellValue === 0){
+                    return '下架';
+                }
+            },
+            changeStatus(category_id,status){
+                modify(category_id,status).then(res => {
                     console.log(res.data)
                     if(res.data.status == '200'){
                         this.getData();
@@ -175,9 +182,9 @@
                     console.log(error)
                 })
             },
-            deleteorder(id) {
+            deletecategory(category_id) {
                 const _this = this;
-                sellerdelete(id).then(res => {
+                categorydelete(category_id).then(res => {
                     console.log(res)
                     if(res.data.status == '200'){
                         this.$message({

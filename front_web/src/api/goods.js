@@ -30,7 +30,7 @@ export function getGoodsTag(){
 //修改产品状态
 export function modify(goods_id,status) {
     return fetch({
-        url: '/overseas/goodsStatus',
+        url: '/manage/goodsModify',
         method: 'post',
         data: {
             goods_id,
@@ -72,32 +72,25 @@ export function addgoods(first_category_id,second_category_id,seller_id,goods_na
     })
 }
 //编辑产品
-export function editgoods(goods_id,first_category_id,second_category_id,goods_name,goods_summary,hospital_name,hospital_summary,hospital_city,sell_price,front_money,specialty,status,share_title,share_content,sort,is_hot,hot_sort,goods_tag,list_img,main_img,hot_img,goods_desc) {
+export function editgoods(goods_id,first_category_id,second_category_id,seller_id,goods_name,goods_summary,sell_price,sort,status,is_hot,goods_tag,share_title,share_content,goods_img,goods_desc) {
     return fetch({
-        url: '/overseas/goodsModify',
+        url: '/manage/goodsModify',
         method: 'post',
         data: {
             goods_id,
             first_category_id,
             second_category_id,
+            seller_id,
             goods_name,
             goods_summary,
-            hospital_name,
-            hospital_summary,
-            hospital_city,
             sell_price,
-            front_money,
-            specialty,
+            sort,
             status,
+            is_hot,
+            goods_tag,
             share_title,
             share_content,
-            sort,
-            is_hot,
-            hot_sort,
-            goods_tag,
-            list_img,
-            main_img,
-            hot_img,
+            goods_img,
             goods_desc
         }
     })
@@ -115,33 +108,10 @@ export function getgoodsinfo(goods_id) {
 //删除产品
 export function goodsdelete(goods_id) {
     return fetch({
-        url: '/overseas/goodsDelete',
+        url: '/manage/goodsDelete',
         method: 'post',
         data: {
             goods_id
         }
     })
 }
-// //添加产品分类
-// export function addgoods(first_category_id,second_category_id,seller_id,goods_name,goods_summary,sell_price,sort,status,is_hot,goods_tag,share_title,share_content,goods_img,goods_desc) {
-//     return fetch({
-//         url: '/manage/goodsModify',
-//         method: 'post',
-//         data: {
-//             first_category_id,
-//             second_category_id,
-//             seller_id,
-//             goods_name,
-//             goods_summary,
-//             sell_price,
-//             sort,
-//             status,
-//             is_hot,
-//             goods_tag,
-//             share_title,
-//             share_content,
-//             goods_img,
-//             goods_desc
-//         }
-//     })
-// }
